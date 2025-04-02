@@ -58,7 +58,6 @@ int main(int argc, char *argv[]) {
 
         if (sched_setscheduler(getpid(), sched_policy, &param) == -1) {
             perror("sched_setscheduler failed");
-            print_stack_trace();
             exit(EXIT_FAILURE);
         }
         run_dummy_process();
