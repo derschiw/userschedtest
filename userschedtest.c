@@ -5,6 +5,27 @@
 #include <sched.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <execinfo.h>
+#include <signal.h>
+
+void print_stack_trace() {
+    void *buffer[100];
+    int size = backtrace(buffer, 100);  // Capture up to 100 stack frames
+    char **symbols = backtrace_symbols(buffer, size);  // Get human-readable symbols
+
+    if (symbols == NULL) {
+        perror("backtrace_symbols");
+        exit(EXIT_FAILURE);
+    }
+
+    // Print the stack trace
+    for (int i = 0; i < size; i++) {
+        printf("%s\n", symbols[i]);
+    }
+
+    free(symbols);  // Don't forget to free the symbols array
+}
+
 
 void run_dummy_process() {
     while (1) {
@@ -51,6 +72,7 @@ int main(int argc, char *argv[]) {
 
         if (sched_setscheduler(getpid(), sched_policy, &param) == -1) {
             perror("sched_setscheduler failed");
+            print_stack_trace();
             exit(EXIT_FAILURE);
         }
         run_dummy_process();
