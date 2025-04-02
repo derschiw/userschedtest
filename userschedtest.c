@@ -8,28 +8,9 @@
 #include <execinfo.h>
 #include <signal.h>
 
-void print_stack_trace() {
-    void *buffer[100];
-    int size = backtrace(buffer, 100);  // Capture up to 100 stack frames
-    char **symbols = backtrace_symbols(buffer, size);  // Get human-readable symbols
-
-    if (symbols == NULL) {
-        perror("backtrace_symbols");
-        exit(EXIT_FAILURE);
-    }
-
-    // Print the stack trace
-    for (int i = 0; i < size; i++) {
-        printf("%s\n", symbols[i]);
-    }
-
-    free(symbols);  // Don't forget to free the symbols array
-}
-
-
 void run_dummy_process() {
+    printf("Running dummy process with PID %d\n", getpid());
     while (1) {
-        printf("Running dummy process with PID %d\n", getpid());
         sleep(1);
     }
 }
@@ -41,6 +22,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    /* As building happens on a local machine - it doesnt have SCHED_USER in sched.h */
+    int SCHED_USER = 7; // Define SCHED_USER for compatibility
     int policy;
     policy = atoi(argv[1]);
     int sched_policy;
@@ -55,6 +38,9 @@ int main(int argc, char *argv[]) {
         case 2:
             sched_policy = SCHED_RR;
             break;
+        case 7:
+            sched_policy = SCHED_USER;
+            break;
         default:
             fprintf(stderr, "Invalid scheduling policy. Use 0, 1, 2 or 7.\n");
             exit(EXIT_FAILURE);
@@ -68,7 +54,7 @@ int main(int argc, char *argv[]) {
     
     if (pid == 0) { // Child process
         struct sched_param param;
-        param.sched_priority = (sched_policy == SCHED_OTHER) ? 0 : 50; // Priority required for FIFO and RR
+        param.sched_priority = (sched_policy == SCHED_OTHER || sched_policy == SCHED_USER) ? 0 : 50; // Priority required for FIFO and RR
 
         if (sched_setscheduler(getpid(), sched_policy, &param) == -1) {
             perror("sched_setscheduler failed");
