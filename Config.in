@@ -1,0 +1,4 @@
+config BR2_PACKAGE_USERSCHEDTEST
+    bool "test software for SCHED_USER policy"
+    help
+      Sofware for testing SCHED_USER policy
