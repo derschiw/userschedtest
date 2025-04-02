@@ -3,7 +3,7 @@ CC = gcc
 .PHONY: clean
 
 userschedtest: userschedtest.c
-    $(CC) -o '$@' '$<'
+	$(CC) -o '$@' '$<'
 
 clean:
-    rm userschedtest
+	rm userschedtest
