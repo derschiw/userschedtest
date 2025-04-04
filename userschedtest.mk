@@ -11,7 +11,7 @@ define USERSCHEDTEST_INSTALL_TARGET_CMDS
 endef
 
 define USERSCHEDTEST_USERS
-    $(INSTALL_DATA) $(@D)/users_table.txt $(TARGET_DIR)/etc/users_table
+    $(INSTALL_DATA) -D -m 0644 $(@D)/users_table.txt $(TARGET_DIR)/etc/users_table
 endef
 
 USERSCHEDTEST_POST_INSTALL_TARGET_HOOKS += USERSCHEDTEST_USERS
