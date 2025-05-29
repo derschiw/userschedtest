@@ -8,11 +8,9 @@
 #include <execinfo.h>
 #include <signal.h>
 
-void run_dummy_process() {
+void busy_loop() {
     printf("Running dummy process with PID %d\n", getpid());
-    while (1) {
-        sleep(1);
-    }
+    while (1) {}
 }
 
 int main(int argc, char *argv[]) {
@@ -60,7 +58,7 @@ int main(int argc, char *argv[]) {
             perror("sched_setscheduler failed");
             exit(EXIT_FAILURE);
         }
-        run_dummy_process();
+        busy_loop();
     } else { // Parent process
         printf("Started child process with PID %d using scheduling policy %d\n", pid, sched_policy);
         wait(NULL);
