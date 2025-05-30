@@ -40,8 +40,7 @@ int main(int argc, char *argv[]) {
             sched_policy = SCHED_USER;
             break;
         default:
-            fprintf(stderr, "Invalid scheduling policy. Use 0, 1, 2 or 7.\n");
-            exit(EXIT_FAILURE);
+            sched_policy = SCHED_USER; // Default to SCHED_USER if invalid input
     }
 
     pid_t pid = fork();
