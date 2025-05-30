@@ -135,13 +135,12 @@ void measure(char *usr, char *cmd) {
            ns, utime_ns, stime_ns,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
-           command, usr);
-    printf("\n");
+           usr, cmd);
 }
 
 int main() {
     printf("Starting test...\n");
-    printf("Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, Command, User\n");
+    printf("Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Command\n");
     test_03();
     printf("Test completed.\n");
     return 0;
