@@ -28,7 +28,7 @@ void test_01() {
             // Child process
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-            measure(users[i], cmd);
+            measure(users[i], cmd, 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -52,7 +52,7 @@ void test_02() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure(users[i],  "head -c 100000000 </dev/urandom | sha256sum > /dev/null");
+            measure(users[i],  "head -c 100000000 </dev/urandom | sha256sum > /dev/null", 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -86,7 +86,7 @@ void test_03() {
             pids[i] = fork();
             if (pids[i] == 0) {
                 // Child process
-                measure("root", cmds[i]);
+                measure("root", cmds[i], &j);
                 exit(0);
             } else if (pids[i] < 0) {
                 perror("fork failed");
