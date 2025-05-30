@@ -115,7 +115,7 @@ void measure(char *usr, char *cmd, int *iteration) {
     
     // This is the command actually executed
     // It will run the command as the specified user and set the scheduling policy to SCHED_USER (7)
-    snprintf(command, sizeof(command), "su - %s -c 'chpol 7 %s'", usr, cmd);
+    snprintf(command, sizeof(command), "su - %s -c 'chpol 7 %s > /dev/null 2>&1'", usr, cmd);
     int result = system(command);
     
     // Finisk the measurement
