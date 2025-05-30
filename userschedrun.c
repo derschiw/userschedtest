@@ -27,7 +27,7 @@ void test_01() {
         if (pids[i] == 0) {
             // Child process
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "head -c 100000000 </dev/urandom | sha256sum > /dev/null");
             measure(users[i], cmd);
             exit(0);
         } else if (pids[i] < 0) {
@@ -52,9 +52,7 @@ void test_02() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-            measure(users[i], cmd);
+            measure(users[i],  "head -c 100000000 </dev/urandom | sha256sum > /dev/null");
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -64,6 +62,37 @@ void test_02() {
 
     // Wait childs processes to finish
     for (int i = 0; i < num_users; ++i) {
+        waitpid(pids[i], NULL, 0);
+    }
+}
+
+
+// A bunch of useless commands that will keep the CPU busy. Sorry climate..
+void test_03() {
+    const char* cmds[] = {
+        "head -c 100000000 </dev/urandom | sha256sum > /dev/null",
+        "head -c 100000000 </dev/urandom | md1sum > /dev/null",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
+        "awk 'BEGIN {for(i=0;i<1000000;i++) x=x+i}'",
+        "yes | head -c 10000000 > /dev/null",
+    };
+    const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
+    pid_t pids[num_cmds];
+
+    for (int i = 0; i < num_cmds; ++i) {
+        pids[i] = fork();
+        if (pids[i] == 0) {
+            // Child process
+            measure("root", cmds[i]);
+            exit(0);
+        } else if (pids[i] < 0) {
+            perror("fork failed");
+            exit(1);
+        }
+    }
+
+    // Wait childs processes to finish
+    for (int i = 0; i < num_cmds; ++i) {
         waitpid(pids[i], NULL, 0);
     }
 }
@@ -79,8 +108,13 @@ void measure(char *usr, char *cmd) {
     // Find docs here: https://www.man7.org/linux/man-pages/man2/getrusage.2.html
     getrusage(RUSAGE_SELF, &usage_before);
     clock_gettime(CLOCK_MONOTONIC, &start);
-    snprintf(command, sizeof(command), "su - %s -c '%s'", usr, cmd);
+    
+    // This is the command actually executed
+    // It will run the command as the specified user and set the scheduling policy to SCHED_USER (7)
+    snprintf(command, sizeof(command), "su - %s -c 'chpol 7 %s'", usr, cmd);
     int result = system(command);
+    
+    // Finisk the measurement
     clock_gettime(CLOCK_MONOTONIC, &end);
     getrusage(RUSAGE_SELF, &usage_after);
 
@@ -104,7 +138,7 @@ void measure(char *usr, char *cmd) {
 
 int main() {
     printf("Starting test...\n");
-    test_02();
+    test_03();
     printf("Test completed.\n");
     return 0;
 }
