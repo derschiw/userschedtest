@@ -13,7 +13,7 @@ void test_00(){
 }
 
 // This will burn CPU but the workload is the same for all users
-// This will read 10 million bytes of random data from /dev/urandom and compute its SHA256 hash.
+// This will read 100 million bytes of random data from /dev/urandom and compute its SHA256 hash.
 // head -c 10000000 </dev/urandom | sha256sum > /dev/null
 // This is the same workload for each task => good for measuring the scheduler performance
 void test_01(){
@@ -21,25 +21,25 @@ void test_01(){
     child1 = fork();
     if (child1 == 0) {
         // Child process for root
-        measure(system("su - root  -c \"chpol 7 head -c 10000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure(system("su - root  -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
         exit(0);
     }
     child2 = fork();
     if (child2 == 0) {
         // Child process for user1
-        measure(system("su - user1 -c \"chpol 7 head -c 10000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure(system("su - user1 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
         exit(0);
     }
     child3 = fork();
     if (child3 == 0) {
         // Child process for user2
-        measure(system("su - user2 -c \"chpol 7 head -c 10000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure(system("su - user2 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
         exit(0);
     }
     child4 = fork();
     if (child4 == 0) {
         // Child process for user3
-        measure(system("su - user3 -c \"chpol 7 head -c 10000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure(system("su - user3 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
         exit(0);
     }
     // Wait for all child processes to finish
