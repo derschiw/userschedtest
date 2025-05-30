@@ -21,25 +21,25 @@ void test_01(){
     child1 = fork();
     if (child1 == 0) {
         // Child process for root
-        measure("su - root  -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
+        measure("root", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
         exit(0);
     }
     child2 = fork();
     if (child2 == 0) {
         // Child process for user1
-        measure("su - user1 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
+        measure("user1", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
         exit(0);
     }
     child3 = fork();
     if (child3 == 0) {
         // Child process for user2
-        measure("su - user2 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
+        measure("user2", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
         exit(0);
     }
     child4 = fork();
     if (child4 == 0) {
         // Child process for user3
-        measure("su - user3 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
+        measure("user3", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
         exit(0);
     }
     // Wait for all child processes to finish
@@ -51,33 +51,29 @@ void test_01(){
 }
 
 // This fution will do the actual measurement 
-void measure(char *cmd) {
+void measure(char *usr, char *cmd) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
-    long ms;
 
     // Measure the time the function has to execute and get resource usage stats
     // Find docs here: https://www.man7.org/linux/man-pages/man2/getrusage.2.html
     getrusage(RUSAGE_SELF, &usage_before);
     clock_gettime(CLOCK_MONOTONIC, &start);
-    int result = system(cmd);
+    int result = system("su - " usr " -c '" cmd "'");
     clock_gettime(CLOCK_MONOTONIC, &end);
     getrusage(RUSAGE_SELF, &usage_after);
 
 
     // Conversions and resource extractions 
-    ms = (end.tv_sec - start.tv_sec) * 1000 +
-         (end.tv_nsec - start.tv_nsec) / 1000000;
+    long ns = (end.tv_sec - start.tv_sec) * 1000000000 + (end.tv_nsec - start.tv_nsec);
+    long utime_ns = (usage_after.ru_utime.tv_sec - usage_before.ru_utime.tv_sec) * 1000000000 +
+                    (usage_after.ru_utime.tv_usec - usage_before.ru_utime.tv_usec) * 1000;
+    long stime_ns = (usage_after.ru_stime.tv_sec - usage_before.ru_stime.tv_sec) * 1000000000 +
+                    (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
 
-    long utime_ms = (usage_after.ru_utime.tv_sec - usage_before.ru_utime.tv_sec) * 1000 +
-                    (usage_after.ru_utime.tv_usec - usage_before.ru_utime.tv_usec) / 1000;
-
-    long stime_ms = (usage_after.ru_stime.tv_sec - usage_before.ru_stime.tv_sec) * 1000 +
-                    (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) / 1000;
-
-    printf("Elapsed time: %ld ms\n", ms); fflush(stdout);
-    printf("User CPU time: %ld ms\n", utime_ms); fflush(stdout);
-    printf("System CPU time: %ld ms\n", stime_ms); fflush(stdout);
+    printf("Elapsed time: %ld ns\n", ns); fflush(stdout);
+    printf("User CPU time: %ld ns\n", utime_ns); fflush(stdout);
+    printf("System CPU time: %ld ns\n", stime_ns); fflush(stdout);
     printf("Number of voluntary context switches: %ld\n", usage_after.ru_nvcsw - usage_before.ru_nvcsw); fflush(stdout);
     printf("Number of involuntary context switches: %ld\n", usage_after.ru_nivcsw - usage_before.ru_nivcsw); fflush(stdout);
 }
