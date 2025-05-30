@@ -1,9 +1,9 @@
 #include <stdlib.h>
 
 int main() {
-    system("su - root  'userschedtest 7 &'");
-    system("su - user1 'userschedtest 7 &'");
-    system("su - user2 'userschedtest 7 &'");
-    system("su - user3 'userschedtest 7 &'");
+    system("su - root  '/usr/bin/userschedtest 7 &'");
+    system("su - user1 '/usr/bin/userschedtest 7 &'");
+    system("su - user2 '/usr/bin/userschedtest 7 &'");
+    system("su - user3 '/usr/bin/userschedtest 7 &'");
     return 0;
 }
