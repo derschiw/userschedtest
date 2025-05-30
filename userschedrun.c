@@ -16,39 +16,58 @@ void test_00(){
 // This will read 100 million bytes of random data from /dev/urandom and compute its SHA256 hash.
 // head -c 10000000 </dev/urandom | sha256sum > /dev/null
 // This is the same workload for each task => good for measuring the scheduler performance
-void test_01(){
-    pid_t child1, child2, child3, child4;
-    child1 = fork();
-    if (child1 == 0) {
-        // Child process for root
-        measure("root", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-        exit(0);
+
+void test_01() {
+    const char* users[] = {"root", "user1", "user2", "user3"};
+    const int num_users = sizeof(users) / sizeof(users[0]);
+    pid_t pids[num_users];
+
+    for (int i = 0; i < num_users; ++i) {
+        pids[i] = fork();
+        if (pids[i] == 0) {
+            // Child process
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
+            measure(users[i], cmd);
+            exit(0);
+        } else if (pids[i] < 0) {
+            perror("fork failed");
+            exit(1);
+        }
     }
-    child2 = fork();
-    if (child2 == 0) {
-        // Child process for user1
-        measure("user1", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-        exit(0);
+
+    // Wait childs processes to finish
+    for (int i = 0; i < num_users; ++i) {
+        waitpid(pids[i], NULL, 0);
     }
-    child3 = fork();
-    if (child3 == 0) {
-        // Child process for user2
-        measure("user2", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-        exit(0);
-    }
-    child4 = fork();
-    if (child4 == 0) {
-        // Child process for user3
-        measure("user3", "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-        exit(0);
-    }
-    // Wait for all child processes to finish
-    waitpid(child1, NULL, 0);
-    waitpid(child2, NULL, 0);
-    waitpid(child3, NULL, 0);  
-    waitpid(child4, NULL, 0);
-    return 0;
 }
+
+// increase the number of processes to 8 for each user (cmp to test_01)
+void test_02() {
+    const char* users[] = {"root", "user1", "user2", "user3","root", "user1", "user2", "user3"};
+    const int num_users = sizeof(users) / sizeof(users[0]);
+    pid_t pids[num_users];
+
+    for (int i = 0; i < num_users; ++i) {
+        pids[i] = fork();
+        if (pids[i] == 0) {
+            // Child process
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null");
+            measure(users[i], cmd);
+            exit(0);
+        } else if (pids[i] < 0) {
+            perror("fork failed");
+            exit(1);
+        }
+    }
+
+    // Wait childs processes to finish
+    for (int i = 0; i < num_users; ++i) {
+        waitpid(pids[i], NULL, 0);
+    }
+}
+
 
 // This fution will do the actual measurement 
 void measure(char *usr, char *cmd) {
@@ -85,7 +104,7 @@ void measure(char *usr, char *cmd) {
 
 int main() {
     printf("Starting test...\n");
-    test_01();
+    test_02();
     printf("Test completed.\n");
     return 0;
 }
