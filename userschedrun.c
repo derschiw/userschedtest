@@ -101,6 +101,25 @@ void test_03() {
     }
 }
 
+// Now do the same as in test_03 but with differnt number of run per task 
+// This will test if something changes after time when the user runs the same command multiple times
+void test_04() {
+    const char* cmds[] = {
+        "head -c 100000000 </dev/urandom | sha256sum > /dev/null",
+        "head -c 100000000 </dev/urandom | md5sum > /dev/null",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
+        "awk \"BEGIN {for(i=0;i<1000000;i++) x=x+i}\"",
+        "yes | head -c 10000000 > /dev/null",
+    };
+    const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
+    pid_t pids[num_cmds];
+    int num_iterations[] = {1, 2, 3, 4, 5}; // Different number of iterations for each command
+    const int num_iterations_count = sizeof(num_iterations) / sizeof(num_iterations[0]);
+    
+    // do this later..
+
+}
+
 
 // This fution will do the actual measurement 
 void measure(char *usr, char *cmd, int *iteration) {
@@ -137,6 +156,9 @@ void measure(char *usr, char *cmd, int *iteration) {
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, cmd);
+    // print a "#" for each second of elapsed time
+    for (long i = 0; i < ns / 1000000000; ++i) {printf("#");}
+    printf("\n");
 }
 
 int main() {
