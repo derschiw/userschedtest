@@ -156,10 +156,30 @@ void measure(char *usr, char *cmd, int *iteration) {
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, cmd);
-    // print a "#" for each second of elapsed time
-    for (long i = 0; i < ns / 1000000000; ++i) {printf("#");}
-    printf("\n");
 }
+
+// Print in color the progress of the command execution
+void print_progress(long ns, char *cmd){
+    int colors[] = {31, 32, 33, 34, 35, 36, 91, 92};
+    int num_colors = sizeof(colors) / sizeof(colors[0]);
+
+    unsigned long h = hash_str(cmd);
+    int color_code = colors[h % num_colors];
+    printf("\033[%dm%s\033[0m\n", color_code, cmd);
+    for (long i = 0; i < ns / 1000000000; ++i) {printf("#");}
+    printf("\033[0m");
+    printf("\n");
+
+}
+unsigned long hash_str(const char *str) {
+    unsigned long hash = 5381;
+    int c;
+    while ((c = *str++)) {
+        hash = ((hash << 5) + hash) + c;
+    }
+    return hash;
+}
+
 
 int main() {
     printf("Starting test...\n");
