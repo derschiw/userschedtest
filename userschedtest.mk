@@ -8,7 +8,7 @@ endef
 
 define USERSCHEDTEST_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/userschedtest $(TARGET_DIR)/usr/bin/userschedtest
-    $(INSTALL) -D -m 0755 $(CURDIR)/userschedrun.sh $(TARGET_DIR)/usr/bin/userschedrun
+    $(INSTALL) -D -m 0755 $(PKGDIR)package/userschedtest/userschedrun.sh $(TARGET_DIR)/usr/bin/userschedrun
 endef
 
 define USERSCHEDTEST_USERS
