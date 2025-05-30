@@ -70,11 +70,11 @@ void test_02() {
 // A bunch of useless commands that will keep the CPU busy. Sorry climate..
 void test_03() {
     const char* cmds[] = {
-        "head -c 100000000 </dev/urandom | sha256sum > /dev/null",
+        "head -c 105000000 </dev/urandom | sha256sum > /dev/null",
         "head -c 100000000 </dev/urandom | md5sum > /dev/null",
         "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "awk \"BEGIN {for(i=0;i<1000000;i++) x=x+i}\"",
-        "yes | head -c 10000000 > /dev/null",
+        "awk \"BEGIN {for(i=0;i<1300000;i++) x=x+i}\"",
+        "yes | head -c 40000000 > /dev/null",
     };
     const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
     pid_t pids[num_cmds];
