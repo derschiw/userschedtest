@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
         perror("execvp failed");
         exit(EXIT_FAILURE);
     } else { // Parent process
-        printf("Started child process with PID %d using scheduling policy %d\n", pid, sched_policy);
         wait(NULL);
     }
 
