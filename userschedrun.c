@@ -21,25 +21,25 @@ void test_01(){
     child1 = fork();
     if (child1 == 0) {
         // Child process for root
-        measure(system("su - root  -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure("su - root  -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
         exit(0);
     }
     child2 = fork();
     if (child2 == 0) {
         // Child process for user1
-        measure(system("su - user1 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure("su - user1 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
         exit(0);
     }
     child3 = fork();
     if (child3 == 0) {
         // Child process for user2
-        measure(system("su - user2 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure("su - user2 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
         exit(0);
     }
     child4 = fork();
     if (child4 == 0) {
         // Child process for user3
-        measure(system("su - user3 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\""));
+        measure("su - user3 -c \"chpol 7 head -c 100000000 </dev/urandom | sha256sum > /dev/null\"");
         exit(0);
     }
     // Wait for all child processes to finish
@@ -51,7 +51,7 @@ void test_01(){
 }
 
 // This fution will do the actual measurement 
-void measure(void (*function)(void)) {
+void measure(char *cmd) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
     long ms;
@@ -60,7 +60,7 @@ void measure(void (*function)(void)) {
     // Find docs here: https://www.man7.org/linux/man-pages/man2/getrusage.2.html
     getrusage(RUSAGE_SELF, &usage_before);
     clock_gettime(CLOCK_MONOTONIC, &start);
-    function();
+    int result = system(cmd);
     clock_gettime(CLOCK_MONOTONIC, &end);
     getrusage(RUSAGE_SELF, &usage_after);
 
