@@ -75,11 +75,11 @@ void measure(void (*function)(void)) {
     long stime_ms = (usage_after.ru_stime.tv_sec - usage_before.ru_stime.tv_sec) * 1000 +
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) / 1000;
 
-    printf("Elapsed time: %ld ms\n", ms);
-    printf("User CPU time: %ld ms\n", utime_ms);
-    printf("System CPU time: %ld ms\n", stime_ms);
-    printf("Number of voluntary context switches: %ld\n", usage_after.ru_nvcsw - usage_before.ru_nvcsw);
-    printf("Number of involuntary context switches: %ld\n", usage_after.ru_nivcsw - usage_before.ru_nivcsw);
+    printf("Elapsed time: %ld ms\n", ms); fflush(stdout);
+    printf("User CPU time: %ld ms\n", utime_ms); fflush(stdout);
+    printf("System CPU time: %ld ms\n", stime_ms); fflush(stdout);
+    printf("Number of voluntary context switches: %ld\n", usage_after.ru_nvcsw - usage_before.ru_nvcsw); fflush(stdout);
+    printf("Number of involuntary context switches: %ld\n", usage_after.ru_nivcsw - usage_before.ru_nivcsw); fflush(stdout);
 }
 
 int main() {
