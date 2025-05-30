@@ -73,11 +73,14 @@ void measure(char *usr, char *cmd) {
     long stime_ns = (usage_after.ru_stime.tv_sec - usage_before.ru_stime.tv_sec) * 1000000000 +
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
 
+    printf("Command executed: %s\n", command); fflush(stdout);
+    printf("Command executed as: %s\n", usr); fflush(stdout);
     printf("Elapsed time: %ld ns\n", ns); fflush(stdout);
     printf("User CPU time: %ld ns\n", utime_ns); fflush(stdout);
     printf("System CPU time: %ld ns\n", stime_ns); fflush(stdout);
     printf("Number of voluntary context switches: %ld\n", usage_after.ru_nvcsw - usage_before.ru_nvcsw); fflush(stdout);
     printf("Number of involuntary context switches: %ld\n", usage_after.ru_nivcsw - usage_before.ru_nivcsw); fflush(stdout);
+    printf("\n");
 }
 
 int main() {
