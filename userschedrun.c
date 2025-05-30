@@ -74,7 +74,7 @@ void test_03() {
         "head -c 100000000 </dev/urandom | md5sum > /dev/null",
         "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
         "awk \"BEGIN {for(i=0;i<1300000;i++) x=x+i}\"",
-        "yes | head -c 40000000 > /dev/null",
+        "yes | head -c 50000000 > /dev/null",
     };
     const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
     pid_t pids[num_cmds];
@@ -109,7 +109,7 @@ void test_04() {
         "head -c 100000000 </dev/urandom | md5sum > /dev/null",
         "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
         "awk \"BEGIN {for(i=0;i<1300000;i++) x=x+i}\"",
-        "yes | head -c 40000000 > /dev/null",
+        "yes | head -c 50000000 > /dev/null",
     };
     const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
     pid_t pids[num_cmds];
