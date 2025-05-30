@@ -3,11 +3,13 @@ USERSCHEDTEST_SITE = ./package/userschedtest
 USERSCHEDTEST_SITE_METHOD = local
 
 define USERSCHEDTEST_BUILD_CMDS
+    $(TARGET_CC) $(TARGET_CFLAGS) -o $(@D)/chpol $(@D)/chpol.c
     $(TARGET_CC) $(TARGET_CFLAGS) -o $(@D)/userschedtest $(@D)/userschedtest.c
     $(TARGET_CC) $(TARGET_CFLAGS) -o $(@D)/userschedrun $(@D)/userschedrun.c
 endef
 
 define USERSCHEDTEST_INSTALL_TARGET_CMDS
+    $(INSTALL) -D -m 0755 $(@D)/chpol $(TARGET_DIR)/usr/bin/chpol
     $(INSTALL) -D -m 0755 $(@D)/userschedtest $(TARGET_DIR)/usr/bin/userschedtest
     $(INSTALL) -D -m 0755 $(@D)/userschedrun $(TARGET_DIR)/usr/bin/userschedrun
 endef
