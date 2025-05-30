@@ -71,7 +71,7 @@ void test_02() {
 void test_03() {
     const char* cmds[] = {
         "head -c 100000000 </dev/urandom | sha256sum > /dev/null",
-        "head -c 100000000 </dev/urandom | md1sum > /dev/null",
+        "head -c 100000000 </dev/urandom | md5sum > /dev/null",
         "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
         "awk \"BEGIN {for(i=0;i<1000000;i++) x=x+i}\"",
         "yes | head -c 10000000 > /dev/null",
