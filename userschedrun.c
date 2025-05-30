@@ -14,10 +14,36 @@ void test_00(){
 
 // This will burn CPU but the workload is the same for all users
 void test_01(){
-    system("su - root  -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e8;i++)x+=i} END{print x}' > /dev/null\"");
-    system("su - user1 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e8;i++)x+=i} END{print x}' > /dev/null\"");
-    system("su - user2 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e8;i++)x+=i} END{print x}' > /dev/null\"");
-    system("su - user3 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e8;i++)x+=i} END{print x}' > /dev/null\"");
+    pid_t child1, child2, child3, child4;
+    child1 = fork();
+    if (child1 == 0) {
+        // Child process for root
+        measure(system("su - root  -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e7;i++)x+=i} END{print x}' > /dev/null\""));
+        exit(0);
+    }
+    child2 = fork();
+    if (child2 == 0) {
+        // Child process for user1
+        measure(system("su - user1 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e7;i++)x+=i} END{print x}' > /dev/null\""));
+        exit(0);
+    }
+    child3 = fork();
+    if (child3 == 0) {
+        // Child process for user2
+        measure(system("su - user2 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e7;i++)x+=i} END{print x}' > /dev/null\""));
+        exit(0);
+    }
+    child4 = fork();
+    if (child4 == 0) {
+        // Child process for user3
+        measure(system("su - user3 -c \"chpol 7 awk 'BEGIN{for(i=0;i<1e7;i++)x+=i} END{print x}' > /dev/null\""));
+        exit(0);
+    }
+    // Wait for all child processes to finish
+    waitpid(child1, NULL, 0);
+    waitpid(child2, NULL, 0);
+    waitpid(child3, NULL, 0);  
+    waitpid(child4, NULL, 0);
     return 0;
 }
 
@@ -55,7 +81,7 @@ void measure(void (*function)(void)) {
 
 int main() {
     printf("Starting test...\n");
-    measure(test_01);
+    test_01();
     printf("Test completed.\n");
     return 0;
 }
