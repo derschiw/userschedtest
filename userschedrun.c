@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/resource.h>
 
 // Test some infinitely running processes that will heat up the CPU 
 void test_00(){
