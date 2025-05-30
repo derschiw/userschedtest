@@ -54,12 +54,14 @@ void test_01(){
 void measure(char *usr, char *cmd) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
+    char command[512];
 
     // Measure the time the function has to execute and get resource usage stats
     // Find docs here: https://www.man7.org/linux/man-pages/man2/getrusage.2.html
     getrusage(RUSAGE_SELF, &usage_before);
     clock_gettime(CLOCK_MONOTONIC, &start);
-    int result = system("su - " usr " -c '" cmd "'");
+    snprintf(command, sizeof(command), "su - %s -c '%s'", usr, cmd);
+    int result = system(command);
     clock_gettime(CLOCK_MONOTONIC, &end);
     getrusage(RUSAGE_SELF, &usage_after);
 
