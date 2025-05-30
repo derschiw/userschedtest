@@ -103,7 +103,7 @@ void test_03() {
 
 
 // This fution will do the actual measurement 
-void measure(char *usr, char *cmd) {
+void measure(char *usr, char *cmd, int *iteration) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
     char command[512];
@@ -131,7 +131,8 @@ void measure(char *usr, char *cmd) {
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
 
     // Print the results
-    printf("%ld, %ld, %ld , %ld, %ld, %s, %s\n",
+    printf("%i, %ld, %ld, %ld , %ld, %ld, %s, %s\n",
+           iteration,
            ns, utime_ns, stime_ns,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
@@ -140,7 +141,7 @@ void measure(char *usr, char *cmd) {
 
 int main() {
     printf("Starting test...\n");
-    printf("Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Command\n");
+    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Command\n");
     test_03();
     printf("Test completed.\n");
     return 0;
