@@ -156,6 +156,7 @@ void measure(char *usr, char *cmd, int *iteration) {
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, cmd);
+    print_progress(ns, cmd);
 }
 
 // Print in color the progress of the command execution
