@@ -176,7 +176,7 @@ void print_progress(long ns, char *cmd){
     unsigned long h = hash_str(cmd);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
-    for (long i = 0; i < ns / 1000000000; ++i) {printf("#");}
+    for (long i = 0; i < ns / 1000000000 * 2; ++i) {printf("#");}
     printf("\033[0m");
     printf("\n");
 
