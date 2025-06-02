@@ -182,7 +182,10 @@ void test_06() {
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
     for (int i = 0; i < 1000; ++i) {
-        exec_cmd_user_pol("root", "dd if=/dev/null of=/dev/null bs=64K count=1", 7);
+        exec_cmd_user_pol("root", "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
+        if (i % 100 == 0) {
+            printf("Completed %d iterations of dd command.\n", i);
+        }
     }
 
     // Now make the cpu busy
