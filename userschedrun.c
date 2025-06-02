@@ -180,11 +180,13 @@ void test_05() {
 
 void test_06() {
     // run dd multiple times to simulate past activity
+    printf("Running dd commands to simulate past activity...\n");
     for (int i = 0; i < 1000; ++i) {
         exec_cmd_user_pol("root", "dd if=/dev/urandom of=/dev/null bs=1M count=1", 7);
     }
 
     // Now make the cpu busy
+    printf("Running CPU background processes...\n");
     for (int i = 0; i < NUM_CORES; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
@@ -196,6 +198,7 @@ void test_06() {
     }
 
     // Now let the CPU run tasks in parallel with different scheduling policies
+    printf("Start tests: Running dd commands with different scheduling policies...\n");
     int num_iterations = 100; // Number of iterations for each command
     for (int j = 0; j < num_iterations; ++j) {
         pid_t pid_user = fork();
