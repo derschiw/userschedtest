@@ -271,12 +271,12 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
 
     // Print the results
-    printf("%i, %ld, %ld, %ld , %ld, %ld, %s, %s\n",
+    printf("%i, %ld, %ld, %ld , %ld, %ld, %s, %i, %s\n",
            iteration,
            ns, utime_ns, stime_ns,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
-           usr, cmd);
+           usr, sched_policy, cmd);
     print_progress(ns, cmd);
 }
 
