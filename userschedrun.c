@@ -3,6 +3,8 @@
 #include <time.h>
 #include <sys/resource.h>
 
+#define NUM_CORES 2
+
 // Test some infinitely running processes that will heat up the CPU 
 void test_00(){
     system("su - root  -c 'chpol 7 yes > /dev/null &'");
@@ -162,7 +164,7 @@ void test_05() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure_normal("root", cmds[i]);
+            measure_normal("root", cmds[i], 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -176,11 +178,64 @@ void test_05() {
     }
 }
 
+// Unqeual number of processes for single user
+void test_06() {
+    // first run dd for 1000 times to increase counter
+    for (int i = 0; i < 1000; ++i) {
+        exec_cmd_user_pol("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", 7);
+    }
+
+    // Now make the cpu busy
+    printf("Running CPU intensive tasks in parallel...\n");
+    for (int i = 0; i < NUM_CORES; ++i) {
+        pid_t pid = fork();
+        if (pid == 0) {
+            system("yes > /dev/null &");
+            exit(0);
+        } else if (pid < 0) {
+            perror("fork failed");
+            exit(1);
+        }
+    }
+
+    // Now let the CPU run tasks in parallel with different scheduling policies
+    int num_iterations = 100; // Number of iterations for each command
+
+    for (int j = 0; j < num_iterations; ++j) {
+        pid_t user_process = fork();
+        pid_t normal_process = fork();
+        if (user_process == 0) {
+            // Child process for user scheduling policy
+            measure_user("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
+            exit(0);
+        } else if (user_process < 0) {
+            perror("fork failed for user process");
+            exit(1);
+        }
+        if (normal_process == 0) {
+            // Child process for normal scheduling policy
+            measure_normal("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
+            exit(0);
+        } else if (normal_process < 0) {
+            perror("fork failed for normal process");
+            exit(1);
+        }
+        waitpid(user_process, NULL, 0); // Wait for user process to finish
+        waitpid(normal_process, NULL, 0); // Wait for normal process to finish
+    }
+}
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
 void measure_normal(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 1);
+}
+
+// Execute a command as a specific user with a given scheduling policy
+void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
+    snprintf(cmd, sizeof(cmd), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
+    system(cmd);
 }
 
 // This fution will do the actual measurement 
@@ -196,8 +251,7 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
     
     // This is the command actually executed
     // It will run the command as the specified user and set the scheduling policy to SCHED_USER (7)
-    snprintf(command, sizeof(command), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
-    int result = system(command);
+    exec_cmd_user_pol(usr, cmd, sched_policy);
     
     // Finisk the measurement
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -271,6 +325,9 @@ int main(int argc, char *argv[]) {
             break;
         case 5:
             test_05();
+            break;
+        case 6:
+            test_06();
             break;
         default:
             printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
