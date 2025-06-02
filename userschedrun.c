@@ -178,6 +178,8 @@ void test_05() {
     }
 }
 
+// This test will run multiple dd commands in parallel with different scheduling policies
+// Should make a difference in the execution time and CPU usage between user and normal scheduling policies
 void test_06() {
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
@@ -227,6 +229,59 @@ void test_06() {
         waitpid(pid_normal, NULL, 0);
     }
 }
+
+// This test will run multiple dd commands in parallel with different scheduling policies
+// Here you wont see an effect as it is the same as test_06 but with less workload
+void test_07() {
+    // run dd multiple times to simulate past activity
+    printf("Running dd commands to simulate past activity...\n");
+    for (int i = 0; i < 100; ++i) {
+        exec_cmd_user_pol("root", "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
+        if (i % 10 == 0) {
+            printf("Completed %d iterations of dd command.\n", i);
+        }
+    }
+
+    // Now make the cpu busy
+    printf("Running CPU background processes...\n");
+    for (int i = 0; i < NUM_CORES; ++i) {
+        pid_t pid = fork();
+        if (pid == 0) {
+            while (1); // Keep the CPU busy
+        } else if (pid < 0) {
+            perror("fork failed for CPU load");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Now let the CPU run tasks in parallel with different scheduling policies
+    printf("Start tests: Running dd commands with different scheduling policies...\n");
+    int num_iterations = 100; // Number of iterations for each command
+    for (int j = 0; j < num_iterations; ++j) {
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            measure_user("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
+            measure_normal("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
+            exit(EXIT_SUCCESS);
+        } else if (pid_normal < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
+    }
+}
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
