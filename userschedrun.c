@@ -28,7 +28,7 @@ void test_01() {
             // Child process
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 100000000 </dev/urandom | sha256sum > /dev/null");
-            measure(users[i], cmd, 0);
+            measure_user(users[i], cmd, 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -52,7 +52,7 @@ void test_02() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure(users[i],  "head -c 100000000 </dev/urandom | sha256sum > /dev/null", 0);
+            measure_user(users[i],  "head -c 100000000 </dev/urandom | sha256sum > /dev/null", 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -86,7 +86,7 @@ void test_03() {
             pids[i] = fork();
             if (pids[i] == 0) {
                 // Child process
-                measure("root", cmds[i], j);
+                measure_user("root", cmds[i], j);
                 exit(0);
             } else if (pids[i] < 0) {
                 perror("fork failed");
@@ -140,7 +140,7 @@ void test_05() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure("root", cmds[i], 0);
+            measure_user("root", cmds[i], 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
@@ -154,9 +154,15 @@ void test_05() {
     }
 }
 
+void measure_user(char *usr, char *cmd, int *iteration){
+    measure(usr, cmd, iteration, 7);
+}
+void measure_normal(char *usr, char *cmd, int *iteration){
+    measure(usr, cmd, iteration, 1);
+}
 
 // This fution will do the actual measurement 
-void measure(char *usr, char *cmd, int *iteration) {
+void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
     char command[512];
@@ -168,7 +174,7 @@ void measure(char *usr, char *cmd, int *iteration) {
     
     // This is the command actually executed
     // It will run the command as the specified user and set the scheduling policy to SCHED_USER (7)
-    snprintf(command, sizeof(command), "su - %s -c 'chpol 7 %s > /dev/null 2>&1'", usr, cmd);
+    snprintf(command, sizeof(command), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
     int result = system(command);
     
     // Finisk the measurement
