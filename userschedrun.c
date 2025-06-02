@@ -230,8 +230,9 @@ void measure_normal(char *usr, char *cmd, int *iteration){
 
 // Execute a command as a specific user with a given scheduling policy
 void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
-    snprintf(cmd, sizeof(cmd), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
-    system(cmd);
+    char fullcmd[512];
+    snprintf(fullcmd, sizeof(fullcmd), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
+    system(fullcmd);
 }
 
 // This fution will do the actual measurement 
