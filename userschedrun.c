@@ -195,7 +195,7 @@ void test_06() {
     for (int i = 0; i < NUM_CORES; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
-            while (1); // Keep the CPU busy
+            system("yes > /dev/null &"); // Keep the CPU busy (will create orphans but we dont care)
         } else if (pid < 0) {
             perror("fork failed for CPU load");
             exit(EXIT_FAILURE);
