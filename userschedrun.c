@@ -332,7 +332,7 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, sched_policy, cmd);
-    print_progress(ns, cmd);
+    print_progress(ns, cmd, sched_policy);
 }
 
 // Print in color the progress of the command execution
