@@ -181,7 +181,7 @@ void test_05() {
 void test_06() {
     // run dd multiple times to simulate past activity
     for (int i = 0; i < 1000; ++i) {
-        exec_cmd_user_pol("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", 7);
+        exec_cmd_user_pol("root", "dd if=/dev/urandom of=/dev/null bs=1M count=1", 7);
     }
 
     // Now make the cpu busy
@@ -231,6 +231,8 @@ void measure_normal(char *usr, char *cmd, int *iteration){
 // Execute a command as a specific user with a given scheduling policy
 void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
     char fullcmd[512];
+    // If you care about your computer you should never do this in real world!
+    // But we dont...
     snprintf(fullcmd, sizeof(fullcmd), "su - %s -c 'chpol %i %s > /dev/null 2>&1'", usr, sched_policy, cmd);
     system(fullcmd);
 }
