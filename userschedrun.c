@@ -162,7 +162,7 @@ void test_05() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure_normal("root", cmds[i], j);
+            measure_normal("root", cmds[i]);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
