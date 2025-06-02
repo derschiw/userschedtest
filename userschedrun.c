@@ -206,7 +206,7 @@ void test_06() {
     for (int j = 0; j < num_iterations; ++j) {
         pid_t pid_user = fork();
         if (pid_user == 0) {
-            measure_user("root", "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
+            measure_user("root", "dd if=/dev/urandom of=/dev/null bs=1M count=300", &j);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
@@ -215,7 +215,7 @@ void test_06() {
 
         pid_t pid_normal = fork();
         if (pid_normal == 0) {
-            measure_normal("root", "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
+            measure_normal("root", "dd if=/dev/urandom of=/dev/null bs=1M count=300", &j);
             exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
