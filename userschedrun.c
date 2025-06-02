@@ -345,11 +345,16 @@ unsigned long hash_str(const char *str) {
     return hash;
 }
 
-void print_progress(long ns, char *cmd){
+void print_progress(long ns, char *cmd, int sched_policy) {
     int colors[] = {31, 32, 33, 34, 35, 36, 91, 92};
     int num_colors = sizeof(colors) / sizeof(colors[0]);
 
-    unsigned long h = hash_str(cmd);
+    // Create a unique string to hash
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "%s %d", cmd, sched_policy);
+
+    // Hash the string to pick a color
+    unsigned long h = hash_str(buffer);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
     for (long i = 0; i < ns / 1000000000 * 2; ++i) {printf("#");}
