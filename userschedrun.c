@@ -135,12 +135,34 @@ void test_05() {
     };
     const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
     pid_t pids[num_cmds];
-    // Fork processes for each command
+    int num_iterations = 3; // Number of iterations for each command
+
+    for (int j = 0; j < num_iterations; ++j) {
+        // Fork processes for each command
+        for (int i = 0; i < num_cmds; ++i) {
+            pids[i] = fork();
+            if (pids[i] == 0) {
+                // Child process
+                measure_user("root", cmds[i], j);
+                exit(0);
+            } else if (pids[i] < 0) {
+                perror("fork failed");
+                exit(1);
+            }
+        }
+        
+        // Wait childs processes to finish
+        for (int i = 0; i < num_cmds; ++i) {
+            waitpid(pids[i], NULL, 0);
+        }
+    }
+    // Now run in normal scheduling policy for comparison
+    printf("Running in normal scheduling policy...\n");
     for (int i = 0; i < num_cmds; ++i) {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure_user("root", cmds[i], 0);
+            measure_normal("root", cmds[i], j);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
