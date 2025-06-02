@@ -183,10 +183,34 @@ void print_progress(long ns, char *cmd){
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
     printf("Starting test...\n");
     printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Command\n");
-    test_03();
+    if (argc < 2) {
+        printf("Usage: userschedrun <test_number>\n");
+        return 1;
+    }
+    int test_number = atoi(argv[1]);
+    switch (test_number) {
+        case 0:
+            test_00();
+            break;
+        case 1:
+            test_01();
+            break;
+        case 2:
+            test_02();
+            break;
+        case 3:
+            test_03();
+            break;
+        case 4:
+            test_04();
+            break;
+        default:
+            printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
+            return 1;
+    }
     printf("Test completed.\n");
     return 0;
 }
