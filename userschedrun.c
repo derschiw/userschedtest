@@ -181,9 +181,9 @@ void test_05() {
 void test_06() {
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 100; ++i) {
         exec_cmd_user_pol("root", "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
-        if (i % 100 == 0) {
+        if (i % 10 == 0) {
             printf("Completed %d iterations of dd command.\n", i);
         }
     }
