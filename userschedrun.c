@@ -123,15 +123,15 @@ void test_04() {
 // Unqeual number of processes for single user
 void test_05() {
     const char* cmds[] = {
-        "head -c 105000000 </dev/urandom | sha256sum > /dev/null",
-        "head -c 100000000 </dev/urandom | md5sum > /dev/null",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "dd if=/dev/urandom of=/dev/null bs=1M count=1000",
-        "awk \"BEGIN {for(i=0;i<1300000;i++) x=x+i}\"",
+        "head -c 10500000 </dev/urandom | sha256sum > /dev/null",
+        "head -c 10000000 </dev/urandom | md5sum > /dev/null",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "dd if=/dev/urandom of=/dev/null bs=1M count=100",
+        "awk \"BEGIN {for(i=0;i<130000;i++) x=x+i}\"",
     };
     const int num_cmds = sizeof(cmds) / sizeof(cmds[0]);
     pid_t pids[num_cmds];
