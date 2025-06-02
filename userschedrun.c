@@ -140,7 +140,7 @@ void test_05() {
         pids[i] = fork();
         if (pids[i] == 0) {
             // Child process
-            measure("root", cmds[i], j);
+            measure("root", cmds[i], 0);
             exit(0);
         } else if (pids[i] < 0) {
             perror("fork failed");
