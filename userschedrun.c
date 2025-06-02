@@ -178,53 +178,49 @@ void test_05() {
     }
 }
 
-// Unqeual number of processes for single user
 void test_06() {
-    // first run dd for 1000 times to increase counter
+    // run dd multiple times to simulate past activity
     for (int i = 0; i < 1000; ++i) {
         exec_cmd_user_pol("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", 7);
     }
 
     // Now make the cpu busy
-    printf("Running CPU intensive tasks in parallel...\n");
     for (int i = 0; i < NUM_CORES; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
-            system("yes > /dev/null &");
-            exit(0);
+            while (1); // Keep the CPU busy
         } else if (pid < 0) {
-            perror("fork failed");
-            exit(1);
+            perror("fork failed for CPU load");
+            exit(EXIT_FAILURE);
         }
     }
 
     // Now let the CPU run tasks in parallel with different scheduling policies
     int num_iterations = 100; // Number of iterations for each command
-
     for (int j = 0; j < num_iterations; ++j) {
-        pid_t user_process = fork();
-        pid_t normal_process = fork();
-        if (user_process == 0) {
-            // Child process for user scheduling policy
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
             measure_user("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
-            exit(0);
-        } else if (user_process < 0) {
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
             perror("fork failed for user process");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
-        if (normal_process == 0) {
-            // Child process for normal scheduling policy
+
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
             measure_normal("root", "dd if=/dev/urandom of=/dev/null bs=1M count=100", &j);
-            exit(0);
-        } else if (normal_process < 0) {
+            exit(EXIT_SUCCESS);
+        } else if (pid_normal < 0) {
             perror("fork failed for normal process");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
-        waitpid(user_process, NULL, 0); // Wait for user process to finish
-        waitpid(normal_process, NULL, 0); // Wait for normal process to finish
+
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
     }
 }
-
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
