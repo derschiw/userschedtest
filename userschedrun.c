@@ -366,7 +366,7 @@ void print_progress(long ns, char *cmd, int sched_policy) {
 
 int main(int argc, char *argv[]) {
     printf("Starting test...\n");
-    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Command\n");
+    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
     if (argc < 2) {
         printf("Usage: userschedrun <test_number>\n");
         return 1;
