@@ -190,18 +190,6 @@ void test_06() {
         }
     }
 
-    // Now make the cpu busy
-    printf("Running CPU background processes...\n");
-    for (int i = 0; i < NUM_CORES; ++i) {
-        pid_t pid = fork();
-        if (pid == 0) {
-            while (1); // Keep the CPU busy
-        } else if (pid < 0) {
-            perror("fork failed for CPU load");
-            exit(EXIT_FAILURE);
-        }
-    }
-
     // Now let the CPU run tasks in parallel with different scheduling policies
     printf("Start tests: Running dd commands with different scheduling policies...\n");
     int num_iterations = 100; // Number of iterations for each command
@@ -241,19 +229,7 @@ void test_07() {
             printf("Completed %d iterations of dd command.\n", i);
         }
     }
-
-    // Now make the cpu busy
-    printf("Running CPU background processes...\n");
-    for (int i = 0; i < NUM_CORES; ++i) {
-        pid_t pid = fork();
-        if (pid == 0) {
-            while (1); // Keep the CPU busy
-        } else if (pid < 0) {
-            perror("fork failed for CPU load");
-            exit(EXIT_FAILURE);
-        }
-    }
-
+    
     // Now let the CPU run tasks in parallel with different scheduling policies
     printf("Start tests: Running dd commands with different scheduling policies...\n");
     int num_iterations = 100; // Number of iterations for each command
@@ -363,6 +339,21 @@ void print_progress(long ns, char *cmd, int sched_policy) {
 
 }
 
+// Add some work to both CPU cores
+void keep_busy() {
+    // Now make the cpu busy
+    printf("Running CPU background processes...\n");
+    for (int i = 0; i < NUM_CORES; ++i) {
+        pid_t pid = fork();
+        if (pid == 0) {
+            while (1); // Keep the CPU busy
+        } else if (pid < 0) {
+            perror("fork failed for CPU load");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Starting test...\n");
@@ -371,6 +362,9 @@ int main(int argc, char *argv[]) {
         printf("Usage: userschedrun <test_number>\n");
         return 1;
     }
+    // Make the CPU work before testing
+    keep_busy(); 
+
     int test_number = atoi(argv[1]);
     switch (test_number) {
         case 0:
