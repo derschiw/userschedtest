@@ -229,7 +229,7 @@ void test_07() {
             printf("Completed %d iterations of dd command.\n", i);
         }
     }
-    
+
     // Now let the CPU run tasks in parallel with different scheduling policies
     printf("Start tests: Running dd commands with different scheduling policies...\n");
     int num_iterations = 100; // Number of iterations for each command
@@ -346,8 +346,11 @@ void keep_busy() {
     for (int i = 0; i < NUM_CORES; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
-            while (1); // Keep the CPU busy
-        } else if (pid < 0) {
+            volatile int x = 0;
+            while (1) {
+                x++;
+            }   
+         } else if (pid < 0) {
             perror("fork failed for CPU load");
             exit(EXIT_FAILURE);
         }
