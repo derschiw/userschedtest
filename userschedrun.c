@@ -103,7 +103,7 @@ void test_03() {
     }
 }
 
-// Now do the same as in test_03 but with differnt number of run per task 
+// Now do the same as in test_03 but with different number of run per task 
 // This will test if something changes after time when the user runs the same command multiple times
 void test_04() {
     const char* cmds[] = {
@@ -119,6 +119,30 @@ void test_04() {
     const int num_iterations_count = sizeof(num_iterations) / sizeof(num_iterations[0]);
     
     // do this later..
+    //^saw this and added what was possibly intended? same as test 03 but changing num iterations
+        for (int iter = 0; iter < num_iterations_count; ++iter) {
+            //loop now takes specific iteration numbers from num_iterations
+            for (int j = 0; j < num_iterations[iter]; ++j) {
+                // Fork processes for each command
+                for (int i = 0; i < num_cmds; ++i) {
+                    pids[i] = fork();
+                    if (pids[i] == 0) {
+                        // Child process
+                        measure_user("root", cmds[i], j);
+                        exit(0);
+                    } else if (pids[i] < 0) {
+                        perror("fork failed");
+                        exit(1);
+                    }
+                }
+                
+                // Wait childs processes to finish
+                for (int i = 0; i < num_cmds; ++i) {
+                    waitpid(pids[i], NULL, 0);
+                }
+            }
+        }
+        
 
 }
 
@@ -261,6 +285,7 @@ void test_07() {
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
+
 void measure_normal(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 1);
 }
@@ -274,7 +299,7 @@ void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
     system(fullcmd);
 }
 
-// This fution will do the actual measurement 
+// This function will do the actual measurement 
 void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
     struct rusage usage_before, usage_after;
     struct timespec start, end;
