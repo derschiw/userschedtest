@@ -302,7 +302,7 @@ void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
 // This function will do the actual measurement 
 void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
     struct rusage usage_before, usage_after;
-    struct timespec start, end;
+    struct timespec start, end, exec;
     char command[512];
 
     // Measure the time the function has to execute and get resource usage stats
@@ -314,7 +314,7 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
     // It will run the command as the specified user and set the scheduling policy to SCHED_USER (7)
     exec_cmd_user_pol(usr, cmd, sched_policy);
     
-    // Finisk the measurement
+    // Finish the measurement
     clock_gettime(CLOCK_MONOTONIC, &end);
     getrusage(RUSAGE_SELF, &usage_after);
 
@@ -325,11 +325,12 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
                     (usage_after.ru_utime.tv_usec - usage_before.ru_utime.tv_usec) * 1000;
     long stime_ns = (usage_after.ru_stime.tv_sec - usage_before.ru_stime.tv_sec) * 1000000000 +
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
+    long wtime_ns = ns - (utime_ns + stime_ns);
 
     // Print the results
-    printf("%i, %ld, %ld, %ld , %ld, %ld, %s, %i, %s\n",
+    printf("%i, %ld, %ld, %ld , %ld, %ld, %ld, %s, %i, %s\n",
            iteration,
-           ns, utime_ns, stime_ns,
+           ns, utime_ns, stime_ns, wtime_ns,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, sched_policy, cmd);
@@ -385,7 +386,7 @@ void keep_busy() {
 
 int main(int argc, char *argv[]) {
     printf("Starting test...\n");
-    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
+    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
     if (argc < 2) {
         printf("Usage: userschedrun <test_number>\n");
         return 1;
