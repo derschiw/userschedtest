@@ -327,10 +327,12 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
                     (usage_after.ru_stime.tv_usec - usage_before.ru_stime.tv_usec) * 1000;
     long wtime_ns = ns - (utime_ns + stime_ns);
 
+    double cpu_utilization = (((double)(utime_ns + stime_ns)) / ns)* 100.0;
+
     // Print the results
-    printf("%i, %ld, %ld, %ld , %ld, %ld, %ld, %s, %i, %s\n",
+    printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
            iteration,
-           ns, utime_ns, stime_ns, wtime_ns,
+           ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, sched_policy, cmd);
@@ -386,7 +388,7 @@ void keep_busy() {
 
 int main(int argc, char *argv[]) {
     printf("Starting test...\n");
-    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
+    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], CPU Utilization, Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
     if (argc < 2) {
         printf("Usage: userschedrun <test_number>\n");
         return 1;
