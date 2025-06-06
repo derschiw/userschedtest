@@ -405,7 +405,7 @@ void print_progress(long ns, char *cmd, int sched_policy, int print_width) {
 void keep_busy() {
     // Now make the cpu busy
     printf("Running CPU background processes...\n");
-    for (int i = 0; i < NUM_CORES; ++i) {
+    for (int i = 0; i < NUM_CORES * 2; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
             volatile int x = 0;
