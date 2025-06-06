@@ -282,6 +282,15 @@ void test_07() {
     }
 }
 
+// Simply run "head -c 10500000 </dev/urandom | sha256sum > /dev/null" 10 times and print the results
+void test_08(){
+    for (int i = 0; i < 10; ++i) {
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "head -c 10500000 </dev/urandom | sha256sum > /dev/null");
+        measure_user("root", cmd, &i);
+    }
+}
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
@@ -418,6 +427,12 @@ int main(int argc, char *argv[]) {
             break;
         case 6:
             test_06();
+            break;
+        case 7:
+            test_07();
+            break;
+        case 8:
+            test_08();
             break;
         default:
             printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
