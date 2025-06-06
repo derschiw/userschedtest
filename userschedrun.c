@@ -284,9 +284,9 @@ void test_07() {
 
 // Simply run "head -c 10500000 </dev/urandom | sha256sum > /dev/null" 10 times and print the results
 void test_08(){
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < 64; ++i) {
         char cmd[256];
-        snprintf(cmd, sizeof(cmd), "head -c 30500000 </dev/urandom | sha256sum > /dev/null");
+        snprintf(cmd, sizeof(cmd), "head -c 500000 </dev/urandom | sha256sum > /dev/null");
         __measure("root", cmd, &i, 7, 3);
     }
 }
@@ -387,6 +387,9 @@ void print_progress(long ns, char *cmd, int sched_policy, int print_width) {
                 break;
             case 4:  
                 printf("####");
+                break;
+            case 8:
+                printf("########");
                 break;
             default:
                 printf("#");
