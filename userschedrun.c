@@ -287,7 +287,7 @@ void test_08(){
     for (int i = 0; i < 32; ++i) {
         char cmd[256];
         snprintf(cmd, sizeof(cmd), "head -c 30500000 </dev/urandom | sha256sum > /dev/null");
-        measure_user("root", cmd, &i);
+        __measure("root", cmd, &i, 7, 3);
     }
 }
 
@@ -308,8 +308,12 @@ void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
     system(fullcmd);
 }
 
+void measure(char *usr, char *cmd, int *iteration, int sched_policy){
+    __measure(usr, cmd, iteration, sched_policy, -1);
+}
+
 // This function will do the actual measurement 
-void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
+void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print_width) {
     struct rusage usage_before, usage_after;
     struct timespec start, end, exec;
     char command[512];
@@ -345,7 +349,7 @@ void measure(char *usr, char *cmd, int *iteration, int sched_policy) {
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
            usr, sched_policy, cmd);
-    print_progress(ns, cmd, sched_policy);
+    print_progress(ns, cmd, sched_policy, print_width);
 }
 
 // Print in color the progress of the command execution
@@ -358,7 +362,7 @@ unsigned long hash_str(const char *str) {
     return hash;
 }
 
-void print_progress(long ns, char *cmd, int sched_policy) {
+void print_progress(long ns, char *cmd, int sched_policy, int print_width) {
     int colors[] = {31, 32, 33, 34, 35, 36, 91, 92};
     int num_colors = sizeof(colors) / sizeof(colors[0]);
 
@@ -370,7 +374,25 @@ void print_progress(long ns, char *cmd, int sched_policy) {
     unsigned long h = hash_str(buffer);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
-    for (long i = 0; i < ns / 1000000000 * 2; ++i) {printf("#");}
+    for (long i = 0; i < ns / 1000000000 * 2; ++i) {
+        switch (print_width) {
+            case -1:
+                printf("#");
+                break;
+            case 2:
+                printf("##");
+                break;
+            case 3:
+                printf("###");
+                break;
+            case 4:  
+                printf("####");
+                break;
+            default:
+                printf("#");
+                break;
+        }
+    }
     printf("\033[0m");
     printf("\n");
 
