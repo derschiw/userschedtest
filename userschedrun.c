@@ -291,6 +291,15 @@ void test_08(){
     }
 }
 
+// As test 8 but more iterations less workload per job
+void test_09(){
+    for (int i = 0; i < 64; ++i) {
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+        __measure("root", cmd, &i, 7, 3);
+    }
+}
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
@@ -458,6 +467,9 @@ int main(int argc, char *argv[]) {
             break;
         case 8:
             test_08();
+            break;
+        case 9:
+            test_09();
             break;
         default:
             printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
