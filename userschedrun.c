@@ -293,7 +293,7 @@ void test_08(){
 
 // As test 8 but more iterations less workload per job
 void test_09(){
-    for (int i = 0; i < 64; ++i) {
+    for (int i = 0; i < 256; ++i) {
         char cmd[256];
         snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
         __measure("root", cmd, &i, 7, 3);
