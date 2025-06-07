@@ -282,6 +282,54 @@ void test_07() {
     }
 }
 
+// A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
+// currently takes way too long to execute, at least for my laptop
+void demotest_08() {
+    const char* users[] = {"root", "user1", "user2"};
+    const int num_users = sizeof(users) / sizeof(users[0]);
+    pid_t pids[num_users];
+
+    // run dd multiple times to simulate past activity for every user
+    printf("Running dd commands to simulate past activity...\n");
+    for (int j = 0; j < num_users; ++j) {
+        for (int i = 0; i < 25; ++i) {
+            exec_cmd_user_pol(users[j], "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
+            if (i % 10 == 0) {
+                printf("Completed %d iterations of dd command.\n", i);
+            }
+        }
+    }
+
+    // Now let the CPU run tasks in parallel with different scheduling policies & users
+    printf("Start tests: Running dd commands with different scheduling policies...\n");
+    int num_iterations = 30; // Number of iterations for each command
+    for (int i = 0; i < num_users; ++i) {
+        for (int j = 0; j < num_iterations; ++j) {
+            pid_t pid_user = fork();
+            if (pid_user == 0) {
+                measure_user(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=25", &j);
+                exit(EXIT_SUCCESS);
+            } else if (pid_user < 0) {
+                perror("fork failed for user process");
+                exit(EXIT_FAILURE);
+            }
+
+            pid_t pid_normal = fork();
+            if (pid_normal == 0) {
+                measure_normal(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=25", &j);
+                exit(EXIT_SUCCESS);
+            } else if (pid_normal < 0) {
+                perror("fork failed for normal process");
+                exit(EXIT_FAILURE);
+            }
+
+            // Wait for both child processes
+            waitpid(pid_user, NULL, 0);
+            waitpid(pid_normal, NULL, 0);
+        }
+    }
+}
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
@@ -361,7 +409,8 @@ void print_progress(long ns, char *cmd, int sched_policy) {
     unsigned long h = hash_str(buffer);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
-    for (long i = 0; i < ns / 1000000000 * 2; ++i) {printf("#");}
+    //0.5s of duration in execution of command = one #
+    for (long i = 0; i < ns / 500000000; ++i) {printf("#");}
     printf("\033[0m");
     printf("\n");
 
@@ -419,6 +468,10 @@ int main(int argc, char *argv[]) {
         case 6:
             test_06();
             break;
+        case 7:
+            test_07();
+        case 8:
+            demotest_08();
         default:
             printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
             return 1;
