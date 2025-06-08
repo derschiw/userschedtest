@@ -146,7 +146,7 @@ void test_04() {
 
 }
 
-// Unqeual number of processes for single user
+// Unequal number of processes for single user
 void test_05() {
     const char* cmds[] = {
         "head -c 10500000 </dev/urandom | sha256sum > /dev/null",
@@ -205,6 +205,7 @@ void test_05() {
 // This test will run multiple dd commands in parallel with different scheduling policies
 // Should make a difference in the execution time and CPU usage between user and normal scheduling policies
 void test_06() {
+
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
     for (int i = 0; i < 100; ++i) {
@@ -291,12 +292,8 @@ void demotest_08() {
     // run dd multiple times to simulate past activity for every user
     printf("Running dd commands to simulate past activity...\n");
     for (int j = 0; j < num_users; ++j) {
-        for (int i = 0; i < 5; ++i) {
-            exec_cmd_user_pol(users[j], "dd if=/dev/zero of=/dev/null bs=4K count=5", 7);
-            if (i % 10 == 0) {
-                printf("Completed %d iterations of dd command.\n", i);
-            }
-        }
+        simulate_past_activity(users[j], 5, 5, 7);
+        simulate_past_activity(users[j], 5, 5, 1);
     }
 
     // Now let the CPU run tasks in parallel with different scheduling policies & users
@@ -433,6 +430,20 @@ void keep_busy() {
     }
 }
 
+// run dd multiple times to simulate past activity
+void simulate_past_activity(char *user, int iterations, int load, int policy) {
+    
+    char cmd[256];
+    for (int i = 0; i < iterations; ++i) {
+        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/null bs=4K count=%d", load);
+        exec_cmd_user_pol(user, cmd , policy);
+        //print every 10 commands done
+        if (i % 10 == 0 && i != 0) {
+            printf("Completed %d iterations of dd command.\n", i);
+        }
+    }
+
+}
 
 int main(int argc, char *argv[]) {
     printf("Starting test...\n");
