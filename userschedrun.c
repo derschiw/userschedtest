@@ -283,7 +283,6 @@ void test_07() {
 }
 
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
-// currently takes way too long to execute, at least for my laptop
 void demotest_08() {
     const char* users[] = {"root", "user1", "user2"};
     const int num_users = sizeof(users) / sizeof(users[0]);
@@ -292,8 +291,8 @@ void demotest_08() {
     // run dd multiple times to simulate past activity for every user
     printf("Running dd commands to simulate past activity...\n");
     for (int j = 0; j < num_users; ++j) {
-        for (int i = 0; i < 25; ++i) {
-            exec_cmd_user_pol(users[j], "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
+        for (int i = 0; i < 5; ++i) {
+            exec_cmd_user_pol(users[j], "dd if=/dev/zero of=/dev/null bs=4K count=5", 7);
             if (i % 10 == 0) {
                 printf("Completed %d iterations of dd command.\n", i);
             }
@@ -302,12 +301,12 @@ void demotest_08() {
 
     // Now let the CPU run tasks in parallel with different scheduling policies & users
     printf("Start tests: Running dd commands with different scheduling policies...\n");
-    int num_iterations = 30; // Number of iterations for each command
+    int num_iterations = 3; // Number of iterations for each command
     for (int i = 0; i < num_users; ++i) {
         for (int j = 0; j < num_iterations; ++j) {
             pid_t pid_user = fork();
             if (pid_user == 0) {
-                measure_user(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=25", &j);
+                measure_user(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
                 exit(EXIT_SUCCESS);
             } else if (pid_user < 0) {
                 perror("fork failed for user process");
@@ -316,7 +315,7 @@ void demotest_08() {
 
             pid_t pid_normal = fork();
             if (pid_normal == 0) {
-                measure_normal(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=25", &j);
+                measure_normal(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
                 exit(EXIT_SUCCESS);
             } else if (pid_normal < 0) {
                 perror("fork failed for normal process");
@@ -473,7 +472,7 @@ int main(int argc, char *argv[]) {
         case 8:
             demotest_08();
         default:
-            printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
+            printf("Invalid test number. Please use Nrs. 0-8 .\n");
             return 1;
     }
     printf("Test completed.\n");
