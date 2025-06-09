@@ -306,6 +306,10 @@ void test_09(){
             perror("fork failed for normal process");
             exit(EXIT_FAILURE);
         }
+
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
     }
 }
 
