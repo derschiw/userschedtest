@@ -287,43 +287,12 @@ void test_08(){
 void test_09(){
     for (int i = 0; i < 256; ++i) {
         printf("\nRunning test 09 iteration %d\n", i);
-        pid_t pid_user = fork();
-        if (pid_user == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 200001 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 3);
-        } else if (pid_user < 0) {
-            perror("fork failed for user process");
-            exit(EXIT_FAILURE);
-        }
-
-        pid_t pid_normal = fork();
-        if (pid_normal == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
-            // 1 = normal policy
-            __measure("root", cmd, &i, 1, 3);
-        } else if (pid_normal < 0) {
-            perror("fork failed for normal process");
-            exit(EXIT_FAILURE);
-        }
-
-        // Wait for both child processes
-        waitpid(pid_user, NULL, 0);
-        waitpid(pid_normal, NULL, 0);
-    }
-}
-
-// As test 8 but more iterations less workload per job
-void test_10(){
-    for (int i = 0; i < 32; ++i) {
-        printf("\nRunning test 09 iteration %d\n", i);
         fflush(stdout);
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 3);
+            __measure("root", cmd, &i, 7, 2);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
@@ -335,7 +304,7 @@ void test_10(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 3);
+            __measure("root", cmd, &i, 1, 2);
             exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
