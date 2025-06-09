@@ -296,20 +296,20 @@ void test_09(){
             exit(EXIT_FAILURE);
         }
 
-        // pid_t pid_normal = fork();
-        // if (pid_normal == 0) {
-        //     char cmd[256];
-        //     snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
-        //     // 1 = normal policy
-        //     __measure("root", cmd, &i, 1, 3);
-        // } else if (pid_normal < 0) {
-        //     perror("fork failed for normal process");
-        //     exit(EXIT_FAILURE);
-        // }
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("root", cmd, &i, 1, 3);
+        } else if (pid_normal < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
 
         // Wait for both child processes
         waitpid(pid_user, NULL, 0);
-        // waitpid(pid_normal, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
     }
 }
 
