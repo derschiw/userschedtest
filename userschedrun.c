@@ -314,6 +314,37 @@ void test_09(){
     }
 }
 
+// As test 8 but more iterations less workload per job
+void test_10(){
+    for (int i = 0; i < 32; ++i) {
+        printf("\nRunning test 09 iteration %d\n", i);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 200001 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, 3);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("root", cmd, &i, 1, 3);
+        } else if (pid_normal < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
+    }
+}
+
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
 void demotest(int iterations) {
     const char* users[] = {"root", "user1", "user2"};
@@ -556,6 +587,9 @@ int main(int argc, char *argv[]) {
             test_09();
             break;
         case 10:
+            test_10();
+            break;
+        case 100:
             demotest(iterations);
         default:
             printf("Invalid test number. Please use Nrs. 0-8 .\n");
