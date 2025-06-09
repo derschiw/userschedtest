@@ -146,7 +146,7 @@ void test_04() {
 
 }
 
-// Unqeual number of processes for single user
+// Unequal number of processes for single user
 void test_05() {
     const char* cmds[] = {
         "head -c 10500000 </dev/urandom | sha256sum > /dev/null",
@@ -205,14 +205,10 @@ void test_05() {
 // This test will run multiple dd commands in parallel with different scheduling policies
 // Should make a difference in the execution time and CPU usage between user and normal scheduling policies
 void test_06() {
+
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
-    for (int i = 0; i < 100; ++i) {
-        exec_cmd_user_pol("root", "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
-        if (i % 10 == 0) {
-            printf("Completed %d iterations of dd command.\n", i);
-        }
-    }
+    simulate_past_activity("root", 100, 1, 7);
 
     // Now let the CPU run tasks in parallel with different scheduling policies
     printf("Start tests: Running dd commands with different scheduling policies...\n");
@@ -245,14 +241,10 @@ void test_06() {
 // This test will run multiple dd commands in parallel with different scheduling policies
 // Here you wont see an effect as it is the same as test_06 but with less workload
 void test_07() {
+    
     // run dd multiple times to simulate past activity
     printf("Running dd commands to simulate past activity...\n");
-    for (int i = 0; i < 100; ++i) {
-        exec_cmd_user_pol("root", "dd if=/dev/zero of=/dev/null bs=4K count=1", 7);
-        if (i % 10 == 0) {
-            printf("Completed %d iterations of dd command.\n", i);
-        }
-    }
+    simulate_past_activity("root", 100, 1, 7);
 
     // Now let the CPU run tasks in parallel with different scheduling policies
     printf("Start tests: Running dd commands with different scheduling policies...\n");
@@ -313,6 +305,48 @@ void test_09(){
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
             exit(EXIT_FAILURE);
+        }
+    }
+}
+
+// A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
+void demotest(int iterations) {
+    const char* users[] = {"root", "user1", "user2"};
+    const int num_users = sizeof(users) / sizeof(users[0]);
+    pid_t pids[num_users];
+
+    // run dd multiple times to simulate past activity for every user
+    printf("Running dd commands to simulate past activity...\n");
+    for (int j = 0; j < num_users; ++j) {
+        simulate_past_activity(users[j], 5, 5, 7);
+        simulate_past_activity(users[j], 5, 5, 1);
+    }
+
+    // Now let the CPU run tasks in parallel with different scheduling policies & users
+    printf("Start tests: Running dd commands with different scheduling policies...\n");
+    for (int i = 0; i < num_users; ++i) {
+        for (int j = 0; j < iterations; ++j) {
+            pid_t pid_user = fork();
+            if (pid_user == 0) {
+                measure_user(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
+                exit(EXIT_SUCCESS);
+            } else if (pid_user < 0) {
+                perror("fork failed for user process");
+                exit(EXIT_FAILURE);
+            }
+
+            pid_t pid_normal = fork();
+            if (pid_normal == 0) {
+                measure_normal(users[i], "dd if=/dev/urandom of=/dev/null bs=1M count=10", &j);
+                exit(EXIT_SUCCESS);
+            } else if (pid_normal < 0) {
+                perror("fork failed for normal process");
+                exit(EXIT_FAILURE);
+            }
+
+            // Wait for both child processes
+            waitpid(pid_user, NULL, 0);
+            waitpid(pid_normal, NULL, 0);
         }
     }
 }
@@ -445,18 +479,46 @@ void keep_busy() {
     }
 }
 
+// run dd multiple times to simulate past activity
+void simulate_past_activity(char *user, int iterations, int load, int policy) {
+    char cmd[256];
+
+    for (int i = 0; i < iterations; ++i) {
+        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/null bs=4K count=%d", load);
+        exec_cmd_user_pol(user, cmd , policy);
+
+        //print every 10 commands done
+        if (i % 10 == 0 && i != 0) {
+            printf("Completed %d iterations of dd command.\n", i);
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
-    printf("Starting test...\n");
-    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], CPU Utilization, Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
+    
     if (argc < 2) {
         printf("Usage: userschedrun <test_number>\n");
         return 1;
     }
+
+    int test_number = atoi(argv[1]);
+    int iterations =  3;
+
+    //allows to change number of iterations for test 8
+    if (test_number == 8) {
+        if (argc > 2) {
+            iterations = atoi(argv[2]);
+        } else {
+            printf("Using default number of iterations.\n");
+        }
+    }
+
+    printf("Starting test...\n");
+    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], CPU Utilization, Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
+
     // Make the CPU work before testing
     keep_busy(); 
 
-    int test_number = atoi(argv[1]);
     switch (test_number) {
         case 0:
             test_00();
@@ -488,8 +550,10 @@ int main(int argc, char *argv[]) {
         case 9:
             test_09();
             break;
+        case 10:
+            demotest(iterations);
         default:
-            printf("Invalid test number. Please use 0, 1, 2, 3, or 4.\n");
+            printf("Invalid test number. Please use Nrs. 0-8 .\n");
             return 1;
     }
     printf("Test completed.\n");
