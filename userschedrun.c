@@ -322,7 +322,7 @@ void test_10(){
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 200001 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "head -c 800001 </dev/urandom | sha256sum > /dev/null");
             __measure("root", cmd, &i, 7, 3);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
@@ -333,7 +333,7 @@ void test_10(){
         pid_t pid_normal = fork();
         if (pid_normal == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "head -c 800000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
             __measure("root", cmd, &i, 1, 3);
             exit(EXIT_SUCCESS);
