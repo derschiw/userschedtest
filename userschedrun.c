@@ -286,7 +286,7 @@ void test_08(){
 // As test 8 but more iterations less workload per job
 void test_09(){
     for (int i = 0; i < 256; ++i) {
-        print("\nRunning test 09 iteration %d\n", i);
+        printf("\nRunning test 09 iteration %d\n", i);
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
