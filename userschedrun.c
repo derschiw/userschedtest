@@ -294,9 +294,26 @@ void test_08(){
 // As test 8 but more iterations less workload per job
 void test_09(){
     for (int i = 0; i < 256; ++i) {
-        char cmd[256];
-        snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
-        __measure("root", cmd, &i, 7, 3);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, 3);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("root", cmd, &i, 1, 3);
+        } else if (pid_normal < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
