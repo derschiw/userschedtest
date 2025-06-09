@@ -279,20 +279,20 @@ void test_08(){
     for (int i = 0; i < 64; ++i) {
         char cmd[256];
         snprintf(cmd, sizeof(cmd), "head -c 500000 </dev/urandom | sha256sum > /dev/null");
-        __measure("root", cmd, &i, 7, 3, false);
+        __measure("root", cmd, &i, 7, 3, 0);
     }
 }
 
 // As test 8 but more iterations less workload per job
 void test_09(){
     for (int i = 0; i < 1024; ++i) {
-        printf("\nRunning test 09 iteration %d\n", i);
-        fflush(stdout);
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, false);
+            __measure("root", cmd, &i, 7, 2, 0);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
@@ -304,7 +304,7 @@ void test_09(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 2, false);
+            __measure("root", cmd, &i, 1, 2, 0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
@@ -377,11 +377,11 @@ void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
 }
 
 void measure(char *usr, char *cmd, int *iteration, int sched_policy){
-    __measure(usr, cmd, iteration, sched_policy, -1, false);
+    __measure(usr, cmd, iteration, sched_policy, -1, 0);
 }
 
 // This function will do the actual measurement 
-void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print_width, bool demo_mode) {
+void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print_width, int demo_mode) {
     struct rusage usage_before, usage_after;
     struct timespec start, end, exec;
     char command[512];
@@ -411,7 +411,7 @@ void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print
     double cpu_utilization = (((double)(utime_ns + stime_ns)) / ns)* 100.0;
 
     // Print the results
-    if (!demo_mode){
+    if (demo_mode == 0){
     printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
            iteration,
            ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
