@@ -413,7 +413,7 @@ void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print
     // Print the results
     if (demo_mode == 0){
     printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
-           iteration,
+           *iteration,
            ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
