@@ -286,6 +286,7 @@ void test_08(){
 // As test 8 but more iterations less workload per job
 void test_09(){
     for (int i = 0; i < 256; ++i) {
+        print("\nRunning test 09 iteration %d\n", i);
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
@@ -407,12 +408,12 @@ void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print
     double cpu_utilization = (((double)(utime_ns + stime_ns)) / ns)* 100.0;
 
     // Print the results
-    printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
-           iteration,
-           ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
-           usage_after.ru_nvcsw - usage_before.ru_nvcsw,
-           usage_after.ru_nivcsw - usage_before.ru_nivcsw,
-           usr, sched_policy, cmd);
+    // printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
+    //        iteration,
+    //        ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
+    //        usage_after.ru_nvcsw - usage_before.ru_nvcsw,
+    //        usage_after.ru_nivcsw - usage_before.ru_nivcsw,
+    //        usr, sched_policy, cmd);
     print_progress(ns, cmd, sched_policy, print_width);
 }
 
