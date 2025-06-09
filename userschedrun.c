@@ -618,8 +618,8 @@ int main(int argc, char *argv[]) {
         case 9:
             test_09();
             break;
-        case 10;
-            test_10());
+        case 10:
+            test_10();
             break;
         case 100:
             demotest(iterations);
