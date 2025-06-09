@@ -442,7 +442,7 @@ void print_progress(long ns, char *cmd, int sched_policy, int print_width) {
     unsigned long h = hash_str(buffer);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
-    for (long i = 0; i < ns / 1000000000 * 2; ++i) {
+    for (long i = 0; i < ns / 1000000000 * 4; ++i) {
         switch (print_width) {
             case -1:
                 printf("#");
