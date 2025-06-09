@@ -318,11 +318,13 @@ void test_09(){
 void test_10(){
     for (int i = 0; i < 32; ++i) {
         printf("\nRunning test 09 iteration %d\n", i);
+        fflush(stdout);
         pid_t pid_user = fork();
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 200001 </dev/urandom | sha256sum > /dev/null");
             __measure("root", cmd, &i, 7, 3);
+            exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
             exit(EXIT_FAILURE);
@@ -334,6 +336,7 @@ void test_10(){
             snprintf(cmd, sizeof(cmd), "head -c 200000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
             __measure("root", cmd, &i, 1, 3);
+            exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
             exit(EXIT_FAILURE);
