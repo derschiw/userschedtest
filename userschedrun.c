@@ -374,6 +374,59 @@ void test_10(){
     }
 }
 
+
+// As test 8 but with more prev iterations less workload per job
+void test_11(){
+    // simulate 10000 runs
+    for (int i = 0; i < 10000; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 10 </dev/urandom | sha256sum > /dev/null");
+            exec_cmd_user_pol("root", cmd , 7);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+    
+    }
+    for (int i = 0; i < 1024; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_normal = fork();
+        if (pid_normal == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("root", cmd, &i, 1, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_normal < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        waitpid(pid_normal, NULL, 0);
+    }
+}
+
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
 void demotest(int iterations) {
     const char* users[] = {"root", "user1", "user2"};
@@ -620,6 +673,9 @@ int main(int argc, char *argv[]) {
             break;
         case 10:
             test_10();
+            break;
+        case 11:
+            test_11();
             break;
         case 100:
             demotest(iterations);
