@@ -587,6 +587,61 @@ void demotest(int iterations) {
     }
 }
 
+void demo1(){
+    printf("\n**** Running demo1 ****\n", );
+    printf("\nSimulating past activity\n");
+    printf("\n################################################################\n");
+
+    // simulate 64 runs
+    for (int i = 0; i < 64; ++i) {
+        printf("#");
+        fflush(stdout);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            exec_cmd_user_pol("user1", cmd , 7);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+    
+    }
+    printf("\n\nFinished simulating past activity\n");
+    for (int i = 0; i < 32; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user_1_1 = fork();
+        if (pid_user_1_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 1,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_2_1 = fork();
+        if (pid_user_2_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user2", cmd, &i, 7, 2, 1,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_2_1 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user_1_1, NULL, 0);
+        waitpid(pid_user_2_1, NULL, 0);
+    }
+}
+
+
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
 }
