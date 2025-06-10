@@ -144,39 +144,6 @@ void test_04() {
         }
 }
 
-
-// As test 9 but users are competing for the same resources
-void test_14(){
-    for (int i = 0; i < 64; ++i) {
-        // printf("\nRunning test 09 iteration %d\n", i);
-        // fflush(stdout);
-        pid_t pid_root = fork();
-        if (pid_root == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0,0);
-            exit(EXIT_SUCCESS);
-        } else if (pid_root < 0) {
-            perror("fork failed for user process");
-            exit(EXIT_FAILURE);
-        }
-        pid_t pid_user1 = fork();
-        if (pid_user1 == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0,1);
-            exit(EXIT_SUCCESS);
-        } else if (pid_user1 < 0) {
-            perror("fork failed for user process");
-            exit(EXIT_FAILURE);
-        }
-        // Wait for both child processes
-        waitpid(pid_root, NULL, 0);
-        waitpid(pid_user1, NULL, 0);
-
-    }
-}
-
 // Unequal number of processes for single user
 void test_05() {
     const char* cmds[] = {
@@ -576,6 +543,71 @@ void test_13(){
 }
 
 
+
+// As test 9 but users are competing for the same resources
+void test_14(){
+    for (int i = 0; i < 64; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_root = fork();
+        if (pid_root == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, 2, 0,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_root < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user1 = fork();
+        if (pid_user1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_root, NULL, 0);
+        waitpid(pid_user1, NULL, 0);
+
+    }
+}
+
+// As test 14 but with policy 1 (for comparision)
+void test_15(){
+    for (int i = 0; i < 64; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_root = fork();
+        if (pid_root == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 0, 2, 0,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_root < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user1 = fork();
+        if (pid_user1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 0, 2, 0,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_root, NULL, 0);
+        waitpid(pid_user1, NULL, 0);
+
+    }
+}
+
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
 void demotest(int iterations) {
     const char* users[] = {"root", "user1", "user2"};
@@ -846,7 +878,7 @@ void measure_user(char *usr, char *cmd, int *iteration){
 }
 
 void measure_normal(char *usr, char *cmd, int *iteration){
-    measure(usr, cmd, iteration, 1);
+    measure(usr, cmd, iteration, 0);
 }
 
 // Execute a command as a specific user with a given scheduling policy
@@ -1057,6 +1089,9 @@ int main(int argc, char *argv[]) {
             break;
         case 14:
             test_14();
+            break;
+        case 15:
+            test_15();
             break;
         case 101:
             demo1();
