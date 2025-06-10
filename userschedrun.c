@@ -464,6 +464,16 @@ void test_12(){
             perror("fork failed for normal process");
             exit(EXIT_FAILURE);
         }
+        pid_t pid_user_1_4 = fork();
+        if (pid_user_1_4 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_4 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
         pid_t pid_user_2_1 = fork();
         if (pid_user_2_1 == 0) {
             char cmd[256];
@@ -479,6 +489,7 @@ void test_12(){
         waitpid(pid_user_1_1, NULL, 0);
         waitpid(pid_user_1_2, NULL, 0);
         waitpid(pid_user_1_3, NULL, 0);
+        waitpid(pid_user_1_4, NULL, 0);
         waitpid(pid_user_2_1, NULL, 0);
     }
 }
