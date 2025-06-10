@@ -484,6 +484,56 @@ void test_12(){
 }
 
 
+void test_13(){
+    // simulate 64 runs
+    for (int i = 0; i < 64; ++i) {
+        printf("\nRunning prev run %d\n", i);
+        fflush(stdout);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            exec_cmd_user_pol("root", cmd , 7);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+    
+    }
+    for (int i = 0; i < 32; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user_1_1 = fork();
+        if (pid_user_1_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_2_1 = fork();
+        if (pid_user_2_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user2", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_2_1 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user_1_1, NULL, 0);
+        waitpid(pid_user_2_1, NULL, 0);
+    }
+}
+
+
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
 void demotest(int iterations) {
     const char* users[] = {"root", "user1", "user2"};
@@ -736,6 +786,9 @@ int main(int argc, char *argv[]) {
             break;
         case 12:
             test_12();
+            break;
+        case 13:
+            test_13();
             break;
         case 100:
             demotest(iterations);
