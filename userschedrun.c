@@ -279,7 +279,7 @@ void test_08(){
     for (int i = 0; i < 64; ++i) {
         char cmd[256];
         snprintf(cmd, sizeof(cmd), "head -c 500000 </dev/urandom | sha256sum > /dev/null");
-        __measure("root", cmd, &i, 7, 3, 0);
+        __measure("root", cmd, &i, 7, 3, 0, 0);
     }
 }
 
@@ -292,7 +292,7 @@ void test_09(){
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
+            __measure("root", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
@@ -304,7 +304,7 @@ void test_09(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 2, 0);
+            __measure("root", cmd, &i, 1, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
@@ -326,7 +326,7 @@ void test_10(){
         if (pid_user_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
+            __measure("root", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1 < 0) {
             perror("fork failed for user process");
@@ -336,7 +336,7 @@ void test_10(){
         if (pid_user_2 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
+            __measure("root", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_2 < 0) {
             perror("fork failed for user process");
@@ -348,7 +348,7 @@ void test_10(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 2, 0);
+            __measure("root", cmd, &i, 1, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal_1 < 0) {
             perror("fork failed for normal process");
@@ -359,7 +359,7 @@ void test_10(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 2, 0);
+            __measure("root", cmd, &i, 1, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal_2 < 0) {
             perror("fork failed for normal process");
@@ -402,7 +402,7 @@ void test_11(){
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
+            __measure("root", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
@@ -414,7 +414,7 @@ void test_11(){
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             // 1 = normal policy
-            __measure("root", cmd, &i, 1, 2, 0);
+            __measure("root", cmd, &i, 1, 2, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_normal < 0) {
             perror("fork failed for normal process");
@@ -437,7 +437,7 @@ void test_12(){
         if (pid_user_1_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0);
+            __measure("user1", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_1 < 0) {
             perror("fork failed for user process");
@@ -447,7 +447,7 @@ void test_12(){
         if (pid_user_1_2 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0);
+            __measure("user1", cmd, &i, 7, 2, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_2 < 0) {
             perror("fork failed for user process");
@@ -458,7 +458,7 @@ void test_12(){
         if (pid_user_1_3 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0);
+            __measure("user1", cmd, &i, 7, 2, 0,2);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_3 < 0) {
             perror("fork failed for normal process");
@@ -468,7 +468,7 @@ void test_12(){
         if (pid_user_1_4 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0);
+            __measure("user1", cmd, &i, 7, 2, 0,3);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_4 < 0) {
             perror("fork failed for normal process");
@@ -478,7 +478,7 @@ void test_12(){
         if (pid_user_2_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user2", cmd, &i, 7, 2, 0);
+            __measure("user2", cmd, &i, 7, 2, 0,4);
             exit(EXIT_SUCCESS);
         } else if (pid_user_2_1 < 0) {
             perror("fork failed for normal process");
@@ -521,7 +521,7 @@ void test_13(){
         if (pid_user_1_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, 2, 0);
+            __measure("user1", cmd, &i, 7, 2, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_1 < 0) {
             perror("fork failed for user process");
@@ -531,7 +531,7 @@ void test_13(){
         if (pid_user_2_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user2", cmd, &i, 7, 2, 0);
+            __measure("user2", cmd, &i, 7, 2, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user_2_1 < 0) {
             perror("fork failed for normal process");
@@ -605,11 +605,11 @@ void exec_cmd_user_pol(const char *usr, const char *cmd, int sched_policy) {
 }
 
 void measure(char *usr, char *cmd, int *iteration, int sched_policy){
-    __measure(usr, cmd, iteration, sched_policy, -1, 0);
+    __measure(usr, cmd, iteration, sched_policy, -1, 0, 0);
 }
 
 // This function will do the actual measurement 
-void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print_width, int demo_mode) {
+void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print_width, int demo_mode, int id) {
     struct rusage usage_before, usage_after;
     struct timespec start, end, exec;
     char command[512];
@@ -640,8 +640,8 @@ void __measure(char *usr, char *cmd, int *iteration, int sched_policy, int print
 
     // Print the results
     if (demo_mode == 0){
-    printf("%i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
-           *iteration,
+    printf("%i, %i, %ld, %ld, %ld , %ld, %f%%, %ld, %ld, %s, %i, %s\n",
+           *iteration, id,
            ns, utime_ns, stime_ns, wtime_ns, cpu_utilization,
            usage_after.ru_nvcsw - usage_before.ru_nvcsw,
            usage_after.ru_nivcsw - usage_before.ru_nivcsw,
@@ -753,7 +753,7 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Starting test...\n");
-    printf("Iteration, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], CPU Utilization, Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
+    printf("Iteration, ID, Elapsed time [ns], User CPU time [ns], System CPU time [ns], Waiting time [ns], CPU Utilization, Voluntary context switches, Involuntary context switches, User, Scheduling Policy, Command\n");
 
     // Make the CPU work before testing
     keep_busy(); 
