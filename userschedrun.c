@@ -458,7 +458,6 @@ void test_12(){
         if (pid_normal_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            // 1 = normal policy
             __measure("root", cmd, &i, 7, 2, 0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal_1 < 0) {
@@ -469,7 +468,6 @@ void test_12(){
         if (pid_normal_2 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            // 1 = normal policy
             __measure("user1", cmd, &i, 7, 2, 0);
             exit(EXIT_SUCCESS);
         } else if (pid_normal_2 < 0) {
