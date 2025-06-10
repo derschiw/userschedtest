@@ -755,6 +755,91 @@ void demo2(){
 }
 
 
+void demo3(){
+    printf("\n**** Running demo1 ****\n" );
+    printf("\nInitializing busy loop.\n");
+    printf("\nSimulating past activity for user 1 for sha256sum command.\n");
+    printf("\n################################################################\n");
+
+    // simulate 64 runs
+    for (int i = 0; i < 32; ++i) {
+        fflush(stdout);
+        pid_t pid_user = fork();
+        if (pid_user == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            exec_cmd_user_pol("user1", cmd , 7);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_user, NULL, 0);
+        printf("##");
+    }
+    printf("\nFinished simulating past activity\n");
+
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("\nRunning demo1 with 32 iterations\n");
+    printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
+    // Green is user1, red is user2
+    printf("\033[31m#\033[0m = user1\n");
+    printf("\033[32m#\033[0m = user2\n\n");
+    for (int i = 0; i < 32; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_root_sha256 = fork();
+        if (pid_root_sha256 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, -1, 1,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_root_sha256 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_root_sha512 = fork();
+        if (pid_root_sha512 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha512sum > /dev/null");
+            __measure("root", cmd, &i, 7, -1, 1,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_root_sha512 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user1_sha256 = fork();
+        if (pid_user1_sha256 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, -1, 1,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user1_sha256 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user1_sha512 = fork();
+        if (pid_user1_sha512 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha512sum > /dev/null");
+            __measure("user1", cmd, &i, 7, -1, 1,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user1_sha512 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_root_sha256, NULL, 0);
+        waitpid(pid_root_sha512, NULL, 0);
+        waitpid(pid_user1_sha256, NULL, 0);
+        waitpid(pid_user1_sha512, NULL, 0);
+    }
+}
+
+
+
 
 void measure_user(char *usr, char *cmd, int *iteration){
     measure(usr, cmd, iteration, 7);
@@ -978,6 +1063,9 @@ int main(int argc, char *argv[]) {
             break;
         case 102:
             demo2();
+            break;
+        case 103:
+            demo3();
             break;
         case 100:
             demotest(iterations);
