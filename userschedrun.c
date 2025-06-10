@@ -504,7 +504,7 @@ void test_13(){
         if (pid_user == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            exec_cmd_user_pol("root", cmd , 7);
+            exec_cmd_user_pol("user1", cmd , 7);
             exit(EXIT_SUCCESS);
         } else if (pid_user < 0) {
             perror("fork failed for user process");
