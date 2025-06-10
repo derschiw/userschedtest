@@ -590,6 +590,7 @@ void demotest(int iterations) {
 
 void demo1(){
     printf("\n**** Running demo1 ****\n" );
+    printf("\nInitializing busy loop.\n");
     printf("\nSimulating past activity for user 1\n");
     printf("\n################################################################\n");
 
@@ -652,6 +653,7 @@ void demo1(){
 // As test 9 but users are competing for the same resources
 void demo2(){
     printf("\n**** Running demo2 ****\n" );
+    printf("\nInitializing busy loop.\n");
 
     printf("\nRunning demo2 with 32 iterations\n");
     printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
