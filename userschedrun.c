@@ -588,7 +588,7 @@ void demotest(int iterations) {
 }
 
 void demo1(){
-    printf("\n**** Running demo1 ****\n", );
+    printf("\n**** Running demo1 ****\n" );
     printf("\nSimulating past activity\n");
     printf("\n################################################################\n");
 
