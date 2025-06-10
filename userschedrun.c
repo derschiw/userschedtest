@@ -142,8 +142,39 @@ void test_04() {
                 }
             }
         }
-        
+}
 
+
+// As test 9 but users are competing for the same resources
+void test_14(){
+    for (int i = 0; i < 64; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_root = fork();
+        if (pid_root == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("root", cmd, &i, 7, 2, 0,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_root < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user1 = fork();
+        if (pid_user1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for both child processes
+        waitpid(pid_root, NULL, 0);
+        waitpid(pid_user1, NULL, 0);
+
+    }
 }
 
 // Unequal number of processes for single user
@@ -939,6 +970,9 @@ int main(int argc, char *argv[]) {
         case 13:
             test_13();
             break;
+        case 14:
+            test_14();
+            break;
         case 101:
             demo1();
             break;
@@ -947,6 +981,7 @@ int main(int argc, char *argv[]) {
             break;
         case 100:
             demotest(iterations);
+            break;
         default:
             printf("Invalid test number. Please use Nrs. 0-8 .\n");
             return 1;
