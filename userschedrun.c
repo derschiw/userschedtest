@@ -856,6 +856,9 @@ int main(int argc, char *argv[]) {
         case 13:
             test_13();
             break;
+        case -1;
+            demo1();
+            break;
         case 100:
             demotest(iterations);
         default:
