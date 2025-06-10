@@ -427,6 +427,65 @@ void test_11(){
     }
 }
 
+
+// As test 9 but users are competing for the same resources
+void test_12(){
+    for (int i = 0; i < 512; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user_1 = fork();
+        if (pid_user_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_2 = fork();
+        if (pid_user_2 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_2 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_normal_1 = fork();
+        if (pid_normal_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("user1", cmd, &i, 1, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_normal_1 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_normal_2 = fork();
+        if (pid_normal_2 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
+            // 1 = normal policy
+            __measure("user2", cmd, &i, 1, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_normal_2 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user_1, NULL, 0);
+        waitpid(pid_user_2, NULL, 0);
+        waitpid(pid_normal_1, NULL, 0);
+        waitpid(pid_normal_2, NULL, 0);
+    }
+}
+
+
 // A frankenstein of test 01 and 07 (and therefore 06) with even less workload to be able to show live.
 void demotest(int iterations) {
     const char* users[] = {"root", "user1", "user2"};
@@ -676,6 +735,9 @@ int main(int argc, char *argv[]) {
             break;
         case 11:
             test_11();
+            break;
+        case 12:
+            test_12();
             break;
         case 100:
             demotest(iterations);
