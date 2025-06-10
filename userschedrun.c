@@ -614,6 +614,7 @@ void demo1(){
 
     printf("\n################################################################\n");
     printf("\nRunning demo1 with 32 iterations\n");
+    printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
     // Green is user1, red is user2
     printf("\033[32m#\033[0m = user1\n");
     printf("\033[31m#\033[0m = user2\n");
@@ -650,7 +651,11 @@ void demo1(){
 
 // As test 9 but users are competing for the same resources
 void demo2(){
-    for (int i = 0; i < 512; ++i) {
+    printf("\n**** Running demo2 ****\n" );
+
+    printf("\nRunning demo2 with 32 iterations\n");
+    printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
+    for (int i = 0; i < 32; ++i) {
         // printf("\nRunning test 09 iteration %d\n", i);
         // fflush(stdout);
         pid_t pid_user_1_1 = fork();
