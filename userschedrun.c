@@ -433,53 +433,53 @@ void test_12(){
     for (int i = 0; i < 512; ++i) {
         // printf("\nRunning test 09 iteration %d\n", i);
         // fflush(stdout);
-        pid_t pid_user_1 = fork();
-        if (pid_user_1 == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
-            exit(EXIT_SUCCESS);
-        } else if (pid_user_1 < 0) {
-            perror("fork failed for user process");
-            exit(EXIT_FAILURE);
-        }
-        pid_t pid_user_2 = fork();
-        if (pid_user_2 == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
-            exit(EXIT_SUCCESS);
-        } else if (pid_user_2 < 0) {
-            perror("fork failed for user process");
-            exit(EXIT_FAILURE);
-        }
-
-        pid_t pid_normal_1 = fork();
-        if (pid_normal_1 == 0) {
-            char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, 2, 0);
-            exit(EXIT_SUCCESS);
-        } else if (pid_normal_1 < 0) {
-            perror("fork failed for normal process");
-            exit(EXIT_FAILURE);
-        }
-        pid_t pid_normal_2 = fork();
-        if (pid_normal_2 == 0) {
+        pid_t pid_user_1_1 = fork();
+        if (pid_user_1_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
             __measure("user1", cmd, &i, 7, 2, 0);
             exit(EXIT_SUCCESS);
-        } else if (pid_normal_2 < 0) {
+        } else if (pid_user_1_1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_1_2 = fork();
+        if (pid_user_1_2 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_2 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_user_1_3 = fork();
+        if (pid_user_1_3 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_3 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_2_1 = fork();
+        if (pid_user_2_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user2", cmd, &i, 7, 2, 0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_2_1 < 0) {
             perror("fork failed for normal process");
             exit(EXIT_FAILURE);
         }
 
         // Wait for both child processes
-        waitpid(pid_user_1, NULL, 0);
-        waitpid(pid_user_2, NULL, 0);
-        waitpid(pid_normal_1, NULL, 0);
-        waitpid(pid_normal_2, NULL, 0);
+        waitpid(pid_user_1_1, NULL, 0);
+        waitpid(pid_user_1_2, NULL, 0);
+        waitpid(pid_user_1_3, NULL, 0);
+        waitpid(pid_user_2_1, NULL, 0);
     }
 }
 
