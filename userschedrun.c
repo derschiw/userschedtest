@@ -792,7 +792,7 @@ void demo3(){
         pid_t pid_root_sha256 = fork();
         if (pid_root_sha256 == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "sha256sum < <(head -c 2000001 /dev/urandom) > /dev/null");
             __measure("root", cmd, &i, 7, -1, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_root_sha256 < 0) {
@@ -802,7 +802,7 @@ void demo3(){
         pid_t pid_root_sha512 = fork();
         if (pid_root_sha512 == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha512sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "sha512sum < <(head -c 2000001 /dev/urandom) > /dev/null");
             __measure("root", cmd, &i, 7, -1, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_root_sha512 < 0) {
@@ -812,7 +812,7 @@ void demo3(){
         pid_t pid_user1_sha256 = fork();
         if (pid_user1_sha256 == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "sha256sum < <(head -c 2000000 /dev/urandom) > /dev/null");
             __measure("user1", cmd, &i, 7, -1, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user1_sha256 < 0) {
@@ -822,7 +822,7 @@ void demo3(){
         pid_t pid_user1_sha512 = fork();
         if (pid_user1_sha512 == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha512sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "sha512sum < <(head -c 2000000 /dev/urandom) > /dev/null");
             __measure("user1", cmd, &i, 7, -1, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user1_sha512 < 0) {
