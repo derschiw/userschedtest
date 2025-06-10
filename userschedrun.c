@@ -587,6 +587,74 @@ void demotest(int iterations) {
     }
 }
 
+
+// As test 9 but users are competing for the same resources
+void test_12(){
+    for (int i = 0; i < 512; ++i) {
+        // printf("\nRunning test 09 iteration %d\n", i);
+        // fflush(stdout);
+        pid_t pid_user_1_1 = fork();
+        if (pid_user_1_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,0);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_1 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_1_2 = fork();
+        if (pid_user_1_2 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,1);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_2 < 0) {
+            perror("fork failed for user process");
+            exit(EXIT_FAILURE);
+        }
+
+        pid_t pid_user_1_3 = fork();
+        if (pid_user_1_3 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,2);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_3 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_1_4 = fork();
+        if (pid_user_1_4 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user1", cmd, &i, 7, 2, 0,3);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_1_4 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+        pid_t pid_user_2_1 = fork();
+        if (pid_user_2_1 == 0) {
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            __measure("user2", cmd, &i, 7, 2, 0,4);
+            exit(EXIT_SUCCESS);
+        } else if (pid_user_2_1 < 0) {
+            perror("fork failed for normal process");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for both child processes
+        waitpid(pid_user_1_1, NULL, 0);
+        waitpid(pid_user_1_2, NULL, 0);
+        waitpid(pid_user_1_3, NULL, 0);
+        waitpid(pid_user_1_4, NULL, 0);
+        waitpid(pid_user_2_1, NULL, 0);
+    }
+}
+
+
 void demo1(){
     printf("\n**** Running demo1 ****\n" );
     printf("\nSimulating past activity\n");
@@ -594,7 +662,6 @@ void demo1(){
 
     // simulate 64 runs
     for (int i = 0; i < 64; ++i) {
-        printf("#");
         fflush(stdout);
         pid_t pid_user = fork();
         if (pid_user == 0) {
@@ -608,9 +675,15 @@ void demo1(){
         }
         // Wait for both child processes
         waitpid(pid_user, NULL, 0);
-    
+        printf("#");
     }
-    printf("\n\nFinished simulating past activity\n");
+    printf("\nFinished simulating past activity\n");
+
+    printf("\n################################################################\n");
+    printf("\nRunning demo1 with 32 iterations\n");
+    // Green is user1, red is user2
+    printf("\033[32m#\033[0m = user1\n");
+    printf("\033[31m#\033[0m = user2\n");
     for (int i = 0; i < 32; ++i) {
         // printf("\nRunning test 09 iteration %d\n", i);
         // fflush(stdout);
@@ -640,6 +713,7 @@ void demo1(){
         waitpid(pid_user_2_1, NULL, 0);
     }
 }
+
 
 
 void measure_user(char *usr, char *cmd, int *iteration){
@@ -728,7 +802,7 @@ void print_progress(long ns, char *cmd, int sched_policy, int print_width) {
     unsigned long h = hash_str(buffer);
     int color_code = colors[h % num_colors];
     printf("\033[%dm", color_code);
-    for (long i = 0; i < ns / 100000000; ++i) {
+    for (long i = 0; i < ns / 50000000; ++i) {
         switch (print_width) {
             case -1:
                 printf("#");
