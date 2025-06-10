@@ -612,7 +612,7 @@ void demo1(){
     }
     printf("\nFinished simulating past activity\n");
 
-    printf("\n################################################################\n");
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("\nRunning demo1 with 32 iterations\n");
     printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
     // Green is user1, red is user2
