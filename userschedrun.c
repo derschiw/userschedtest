@@ -697,7 +697,7 @@ void demo2(){
         pid_t pid_user_2_1 = fork();
         if (pid_user_2_1 == 0) {
             char cmd[256];
-            snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
+            snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
             __measure("user2", cmd, &i, 7, -1, 1, 4);
             exit(EXIT_SUCCESS);
         } else if (pid_user_2_1 < 0) {
