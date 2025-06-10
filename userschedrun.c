@@ -655,6 +655,8 @@ void demo2(){
 
     printf("\nRunning demo2 with 32 iterations\n");
     printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
+    printf("\033[31m#\033[0m = user1\n");
+    printf("\033[32m#\033[0m = user2\n\n");
     for (int i = 0; i < 32; ++i) {
         // printf("\nRunning test 09 iteration %d\n", i);
         // fflush(stdout);
