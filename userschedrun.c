@@ -795,7 +795,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    signed int test_number = atoi(argv[1]);
+    int test_number = atoi(argv[1]);
     int iterations =  3;
 
     //allows to change number of iterations for test 8
