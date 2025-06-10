@@ -657,7 +657,7 @@ void demo1(){
         if (pid_user_1_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, -1, 1,0);
+            __measure("user1", cmd, &i, 7, -1, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_1 < 0) {
             perror("fork failed for user process");
@@ -756,7 +756,7 @@ void demo2(){
 
 
 void demo3(){
-    printf("\n**** Running demo1 ****\n" );
+    printf("\n**** Running demo3 ****\n" );
     printf("\nInitializing busy loop.\n");
     printf("\nSimulating past activity for user 1 for sha256sum command.\n");
     printf("\n################################################################\n");
@@ -781,7 +781,7 @@ void demo3(){
     printf("\nFinished simulating past activity\n");
 
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("\nRunning demo1 with 32 iterations\n");
+    printf("\nRunning demo3 with 32 iterations\n");
     printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
     // Green is user1, red is user2
     printf("\033[31m#\033[0m = user1\n");
@@ -793,7 +793,7 @@ void demo3(){
         if (pid_root_sha256 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("root", cmd, &i, 7, -1, 1,0);
+            __measure("root", cmd, &i, 7, -1, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_root_sha256 < 0) {
             perror("fork failed for user process");
@@ -803,7 +803,7 @@ void demo3(){
         if (pid_root_sha512 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha512sum > /dev/null");
-            __measure("root", cmd, &i, 7, -1, 1,0);
+            __measure("root", cmd, &i, 7, -1, 0,0);
             exit(EXIT_SUCCESS);
         } else if (pid_root_sha512 < 0) {
             perror("fork failed for user process");
@@ -813,7 +813,7 @@ void demo3(){
         if (pid_user1_sha256 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, -1, 1,1);
+            __measure("user1", cmd, &i, 7, -1, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user1_sha256 < 0) {
             perror("fork failed for normal process");
@@ -823,7 +823,7 @@ void demo3(){
         if (pid_user1_sha512 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000000 </dev/urandom | sha512sum > /dev/null");
-            __measure("user1", cmd, &i, 7, -1, 1,1);
+            __measure("user1", cmd, &i, 7, -1, 0,1);
             exit(EXIT_SUCCESS);
         } else if (pid_user1_sha512 < 0) {
             perror("fork failed for normal process");
