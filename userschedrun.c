@@ -655,6 +655,7 @@ void demo1(){
     printf("\n**** Running demo1 ****\n" );
     printf("\nInitializing busy loop.\n");
     printf("\nSimulating past activity for user 1\n");
+    printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
     printf("\n################################################################\n");
 
     // simulate 64 runs
@@ -678,7 +679,6 @@ void demo1(){
 
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("\nRunning demo1 with 32 iterations\n");
-    printf("\nCommand: head -c 2000000 </dev/urandom | sha256sum > /dev/null\n");
     // Green is user1, red is user2
     printf("\033[31m#\033[0m = user1\n");
     printf("\033[32m#\033[0m = user2\n\n");
