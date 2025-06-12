@@ -689,7 +689,7 @@ void demo1(){
         if (pid_user_1_1 == 0) {
             char cmd[256];
             snprintf(cmd, sizeof(cmd), "head -c 2000001 </dev/urandom | sha256sum > /dev/null");
-            __measure("user1", cmd, &i, 7, -1, 0,0);
+            __measure("user1", cmd, &i, 7, -1, 1,0);
             exit(EXIT_SUCCESS);
         } else if (pid_user_1_1 < 0) {
             perror("fork failed for user process");
